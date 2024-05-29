@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>cachina.pe</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <h1>CACHINA</h1>
+    <header>
+        <div class="header-left">
+            <div id="visit-count">Visits: 0</div>
+            <div id="location-name">Perú</div>
+        </div>
+        <div class="header-right">
+            <div id="local-time"></div>
+            <!---->
+            <button class="publica-button" onclick="window.location.href='http://localhost:3000/upload.html'">Publica</button>
+        
+        </div>
+    </header>
+    <div class="banner">
+        <div class="slides">
+            <img src="/banner/banner_1.png" class="slide" alt="Image 1">
+            <img src="/banner/banner_2.png" class="slide" alt="Image 2">
+            <img src="/banner/banner_3.png" class="slide" alt="Image 3">
+        </div>
+    </div>
+    <div class="search-filters">
+        <input type="text" id="searchInput" placeholder="Search for a business...">
+        <select id="categoryFilter">
+            <option value="">All Categories</option>
+            <option value="Empleo">Empleo</option>
+            <option value="Venta">Venta</option>
+            <option value="Servicio">Servicio</option>
+            <option value="Mercado">Mercado</option>
+            <option value="Deporte">Deporte</option>
+            <option value="Evento">Evento</option>
+        </select>
+        <select id="locationFilter">
+            <option value="">All Locations</option>
+            <!-- Add options for the 24 departments of Peru -->
+            <option value="Amazonas">Amazonas</option>
+            <option value="Áncash">Áncash</option>
+            <option value="Apurímac">Apurímac</option>
+            <option value="Arequipa">Arequipa</option>
+            <option value="Ayacucho">Ayacucho</option>
+            <option value="Cajamarca">Cajamarca</option>
+            <option value="Callao">Callao</option>
+            <option value="Cusco">Cusco</option>
+            <option value="Huancavelica">Huancavelica</option>
+            <option value="Huánuco">Huánuco</option>
+            <option value="Ica">Ica</option>
+            <option value="Junín">Junín</option>
+            <option value="La Libertad">La Libertad</option>
+            <option value="Lambayeque">Lambayeque</option>
+            <option value="Lima">Lima</option>
+            <option value="Loreto">Loreto</option>
+            <option value="Madre de Dios">Madre de Dios</option>
+            <option value="Moquegua">Moquegua</option>
+            <option value="Pasco">Pasco</option>
+            <option value="Piura">Piura</option>
+            <option value="Puno">Puno</option>
+            <option value="San Martín">San Martín</option>
+            <option value="Tacna">Tacna</option>
+            <option value="Tumbes">Tumbes</option>
+            <option value="Ucayali">Ucayali</option>
+        </select>
+    </div>
+    <div id="business-list"></div>
+    <footer>
+        <a href="#libro-de-reclamaciones">Libro de reclamaciones</a>
+        <a href="#terminos-y-condiciones">Términos y Condiciones</a>
+        <a href="#contact">Contact Information</a>
+        <a href="#social-media">Social Media</a>
+    </footer>
+    <script src="index.js"></script>
+</body>
+</html>
