@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Extract Coordinates</title>
+    <script>
+        function extractLatLng() {
+            var url = document.getElementById('url').value;
+            var regex = /@(-?\d+\.\d+),(-?\d+\.\d+)/;
+            var match = regex.exec(url);
+            if (match) {
+                document.getElementById('result').innerHTML = 'Latitude: ' + match[1] + ', Longitude: ' + match[2];
+            } else {
+                document.getElementById('result').innerHTML = 'No coordinates found in the provided URL.';
+            }
+        }
+    </script>
+</head>
+<body>
+    <h1>Extract Coordinates from Google Maps URL</h1>
+    <input type="text" id="url" placeholder="Paste Google Maps URL here">
+    <button onclick="extractLatLng()">Extract</button>
+    <p id="result"></p>
+</body>
+</html>
