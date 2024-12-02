@@ -1,9 +1,16 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import API from "../services/api";
 
 const EditAdModal = ({ ad, isOpen, onClose, onAdUpdated }) => {
     const [formData, setFormData] = useState({ ...ad });
     const [error, setError] = useState("");
+
+    useEffect(() => {
+        // Reset form data when ad changes
+        if (ad) {
+            setFormData({ ...ad });
+        }
+    }, [ad]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -13,11 +20,13 @@ const EditAdModal = ({ ad, isOpen, onClose, onAdUpdated }) => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const response = await API.put(`/ads/${ad._id}`, formData);
-            onAdUpdated(response.data); // Update the ad in the parent component
+            const response = await API.put(`/ads/${ad._id}`, formData); // API call to update ad
+            onAdUpdated(response.data.updatedAd); // Notify parent of updated ad
+            console.log("Updated ad sent to parent:", response.data.updatedAd);
             onClose(); // Close the modal
         } catch (err) {
             setError(err.response?.data?.message || "Failed to update ad");
+            console.error("Failed to update ad:", err.response?.data || err.message);
         }
     };
 
@@ -32,14 +41,14 @@ const EditAdModal = ({ ad, isOpen, onClose, onAdUpdated }) => {
                     <input
                         type="text"
                         name="title"
-                        value={formData.title}
+                        value={formData.title || ""}
                         onChange={handleChange}
                         placeholder="Title"
                         className="w-full border p-2"
                     />
                     <textarea
                         name="description"
-                        value={formData.description}
+                        value={formData.description || ""}
                         onChange={handleChange}
                         placeholder="Description"
                         className="w-full border p-2"
@@ -63,30 +72,4 @@ const EditAdModal = ({ ad, isOpen, onClose, onAdUpdated }) => {
     );
 };
 
-const handleSaveChanges = async () => {
-    try {
-        const response = await API.put(`/ads/${ad._id}`, formData); // Send the updated ad details
-        onAdUpdated(response.data.updatedAd); // Update the parent state
-        onClose(); // Close the modal
-    } catch (err) {
-        console.error("Failed to update ad:", err.response?.data || err.message);
-        alert(err.response?.data?.message || "Failed to update ad");
-    }
-};
-
-const handleDeleteAd = async (adId) => {
-    if (!window.confirm("Are you sure you want to delete this ad?")) return;
-
-    try {
-        const response = await API.delete(`/ads/${adId}`);
-        alert(response.data.message);
-        setAds((prevAds) => prevAds.filter((ad) => ad._id !== adId)); // Update state
-    } catch (err) {
-        console.error("Error deleting ad:", err.response?.data || err.message);
-        alert(err.response?.data?.message || "Failed to delete ad");
-    }
-};
-
-
 export default EditAdModal;
-

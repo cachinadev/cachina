@@ -49,5 +49,12 @@ const AllAds = () => {
     );
 };
 
+const handleAdUpdated = (updatedAd) => {
+    console.log("Updated ad received:", updatedAd);
+    setAds((prevAds) =>
+        prevAds.map((ad) => (ad._id === updatedAd._id ? updatedAd : ad))
+    );
+};
+
 export default AllAds;
 

@@ -66,19 +66,23 @@ router.get("/my-ads", protect, async (req, res) => {
 // Delete an Ad
 router.delete("/:id", protect, async (req, res) => {
     try {
+        console.log("Delete request received for ad ID:", req.params.id);
+
         const ad = await Ad.findById(req.params.id);
+        console.log("Ad details:", ad);
 
         if (!ad) {
+            console.log("Ad not found.");
             return res.status(404).json({ message: "Ad not found" });
         }
 
         if (ad.createdBy.toString() !== req.user.id) {
+            console.log("User not authorized to delete this ad.");
             return res.status(403).json({ message: "Not authorized to delete this ad" });
         }
 
-        // Use findByIdAndDelete instead of remove
         await Ad.findByIdAndDelete(req.params.id);
-
+        console.log("Ad deleted successfully.");
         res.status(200).json({ message: "Ad deleted successfully" });
     } catch (error) {
         console.error("Error deleting ad:", error.message);
@@ -104,11 +108,14 @@ router.put("/:id", protect, async (req, res) => {
             runValidators: true, // Ensure validations are applied
         });
 
+        console.log("Updated ad:", updatedAd); // Log for debugging
+
         res.status(200).json({ message: "Ad updated successfully", updatedAd });
     } catch (error) {
         console.error("Error updating ad:", error.message);
         res.status(500).json({ message: "Failed to update ad" });
     }
 });
+
 
 module.exports = router;

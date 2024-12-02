@@ -75,7 +75,6 @@ const Dashboard = () => {
     );
 };
 ////
-
 const AllAds = () => {
     const [ads, setAds] = useState([]);
     const [selectedAd, setSelectedAd] = useState(null);
@@ -95,54 +94,65 @@ const AllAds = () => {
     }, []);
 
     const handleEditAd = (ad) => {
-        setSelectedAd(ad);
+        setSelectedAd(ad); // Pass the selected ad to the modal
         setIsEditModalOpen(true);
     };
 
     const handleAdUpdated = (updatedAd) => {
-        setAds(ads.map((ad) => (ad._id === updatedAd._id ? updatedAd : ad)));
+        console.log("Updated ad received:", updatedAd);
+        // Update the state with the edited ad
+        setAds((prevAds) =>
+            prevAds.map((ad) => (ad._id === updatedAd._id ? updatedAd : ad))
+        );
     };
 
+    //Delete Ad
     const handleDeleteAd = async (adId) => {
         if (!window.confirm("Are you sure you want to delete this ad?")) return;
 
         try {
             const response = await API.delete(`/ads/${adId}`);
-            alert(response.data.message); // Display success message
-            setAds(ads.filter((ad) => ad._id !== adId)); // Remove deleted ad from state
+            console.log("Delete response:", response.data);
+
+            // Update the ads state to reflect the deletion
+            setAds((prevAds) => prevAds.filter((ad) => ad._id !== adId));
+            alert(response.data.message); // Show success message
         } catch (err) {
+            console.error("Error deleting ad:", err.response?.data || err.message);
             alert(err.response?.data?.message || "Failed to delete ad");
         }
     };
 
-    if (ads.length === 0) return <p>You have no ads yet.</p>;
-
     return (
         <div>
             <h2 className="text-xl font-bold mb-4">Your Ads</h2>
-            <ul className="space-y-4">
-                {ads.map((ad) => (
-                    <li key={ad._id} className="p-4 border rounded-md shadow-sm">
-                        <h3 className="text-lg font-bold">{ad.title}</h3>
-                        <p>{ad.description}</p>
-                        <p className="text-sm text-gray-500">Category: {ad.category}</p>
-                        <div className="mt-2 flex gap-2">
-                            <button
-                                onClick={() => handleEditAd(ad)}
-                                className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
-                            >
-                                Edit
-                            </button>
-                            <button
-                                onClick={() => handleDeleteAd(ad._id)}
-                                className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
-                            >
-                                Delete
-                            </button>
-                        </div>
-                    </li>
-                ))}
-            </ul>
+            {ads.length === 0 ? (
+                <p>You have no ads yet.</p>
+            ) : (
+                <ul className="space-y-4">
+                    {ads.map((ad) => (
+                        <li key={ad._id} className="p-4 border rounded-md shadow-sm">
+                            <h3 className="text-lg font-bold">{ad.title}</h3>
+                            <p>{ad.description}</p>
+                            <p className="text-sm text-gray-500">Category: {ad.category}</p>
+                            <div className="mt-2 flex gap-2">
+                                <button
+                                    onClick={() => handleEditAd(ad)}
+                                    className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
+                                >
+                                    Edit
+                                </button>
+                                <button
+                                    onClick={() => handleDeleteAd(ad._id)}
+                                    className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
+                                >
+                                    Delete
+                                </button>
+                            </div>
+                        </li>
+                    ))}
+                </ul>
+            )}
             <EditAdModal
                 ad={selectedAd}
                 isOpen={isEditModalOpen}
@@ -341,24 +351,12 @@ const CreateAd = () => {
     );
 };
 
-const handleDeleteAd = async (adId) => {
-    if (!window.confirm("Are you sure you want to delete this ad?")) return;
-
-    try {
-        const response = await API.delete(`/ads/${adId}`);
-        alert(response.data.message); // Display success message
-        setAds(ads.filter((ad) => ad._id !== adId)); // Remove deleted ad from state
-    } catch (err) {
-        alert(err.response?.data?.message || "Failed to delete ad");
-    }
-};
 <button
     onClick={() => handleDeleteAd(ad._id)}
     className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
 >
     Delete
 </button>
-
 
 
 export default Dashboard;
