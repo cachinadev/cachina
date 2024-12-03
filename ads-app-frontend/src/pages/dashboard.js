@@ -3,25 +3,28 @@ import { useRouter } from "next/router";
 import API from "../services/api";
 import EditAdModal from "../components/EditAdModal";
 
-
 const Dashboard = () => {
     const [user, setUser] = useState(null);
     const router = useRouter();
     const [activeTab, setActiveTab] = useState("allAds"); // Manage tabs: All Ads / Create Ad
 
     useEffect(() => {
-
         const fetchUserDetails = async () => {
             try {
                 const response = await API.get("/users/me");
-                setUser(response.data);
+                console.log("User data:", response.data); // For debugging
+                setUser({
+                    ...response.data,
+                    adsPosted: response.data.adsPosted || [],
+                    uniqueId: response.data.uniqueId || "Unknown",
+                });
+
             } catch (err) {
                 console.error("Failed to fetch user details:", err.response?.data || err.message);
                 localStorage.removeItem("token"); // Clear invalid token
                 router.push("/login"); // Redirect to login page
             }
         };
-
         fetchUserDetails();
     }, [router]);
 
@@ -29,14 +32,19 @@ const Dashboard = () => {
         localStorage.removeItem("token");
         router.push("/login");
     };
-
-    if (!user) return <div>Loading...</div>;
-
+ 
+    if (!user) {
+        return (
+            <div className="flex justify-center items-center h-screen">
+                <p>Loading your dashboard...</p>
+            </div>
+        );
+    }
     return (
         <div className="flex h-screen">
             <aside className="w-1/4 bg-gray-800 text-white p-4">
                 <h1 className="text-2xl font-bold mb-4">{user.name}</h1>
-                <p>ID: {user.id}</p>
+                <p>ID: {user.uniqueId}</p> {/* Display the unique ID */}
                 <p>Plan: {user.planType}</p>
                 <p>Ads Posted: {user.adsPosted.length}</p>
                 <nav className="mt-6">
@@ -74,6 +82,7 @@ const Dashboard = () => {
         </div>
     );
 };
+
 ////
 const AllAds = () => {
     const [ads, setAds] = useState([]);

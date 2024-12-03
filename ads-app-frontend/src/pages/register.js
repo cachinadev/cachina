@@ -1,21 +1,22 @@
-import { useState } from 'react';
-import { useRouter } from 'next/router';
-import axios from 'axios';
+import { useState } from "react";
+import { useRouter } from "next/router";
+import axios from "axios";
 
 const Registration = () => {
   const router = useRouter();
   const [formData, setFormData] = useState({
-    type: 'personal', // Default to personal
-    name: '',
-    companyName: '',
-    taxId: '',
-    phone: '',
-    password: '',
-    confirmPassword: '',
+    type: "personal", // Default to personal
+    name: "",
+    companyName: "",
+    taxId: "",
+    phone: "",
+    password: "",
+    confirmPassword: "",
   });
   const [showPassword, setShowPassword] = useState(false); // Toggle password visibility
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+  const [uniqueId, setUniqueId] = useState(null); // Store unique ID
   const [loading, setLoading] = useState(false); // Loading state for button
 
   const handleChange = (e) => {
@@ -24,7 +25,10 @@ const Registration = () => {
   };
 
   const handleToggleType = () => {
-    setFormData({ ...formData, type: formData.type === 'personal' ? 'company' : 'personal' });
+    setFormData({
+      ...formData,
+      type: formData.type === "personal" ? "company" : "personal",
+    });
   };
 
   const handleSubmit = async (e) => {
@@ -33,25 +37,25 @@ const Registration = () => {
 
     // Form Validation
     if (formData.password !== formData.confirmPassword) {
-      setError('Passwords do not match');
+      setError("Passwords do not match");
       setLoading(false);
       return;
     }
 
     if (!formData.name || !formData.phone || !formData.password) {
-      setError('All fields are required');
+      setError("All fields are required");
       setLoading(false);
       return;
     }
 
     if (formData.phone.length !== 9 || isNaN(formData.phone)) {
-      setError('Phone number must be 9 digits');
+      setError("Phone number must be 9 digits");
       setLoading(false);
       return;
     }
 
-    if (formData.type === 'company' && !formData.taxId) {
-      setError('Tax ID (RUC) is required for companies');
+    if (formData.type === "company" && !formData.taxId) {
+      setError("Tax ID (RUC) is required for companies");
       setLoading(false);
       return;
     }
@@ -59,25 +63,31 @@ const Registration = () => {
     try {
       const payload = {
         type: formData.type,
-        name: formData.type === 'personal' ? formData.name : formData.companyName,
-        taxId: formData.type === 'company' ? formData.taxId : undefined,
+        name: formData.type === "personal" ? formData.name : formData.companyName,
+        taxId: formData.type === "company" ? formData.taxId : undefined,
         phoneNumber: formData.phone, // Backend expects phoneNumber
         password: formData.password,
       };
 
-      const response = await axios.post('http://localhost:5000/api/users/register', payload);
+      const response = await axios.post(
+        "http://localhost:5000/api/users/register",
+        payload
+      );
 
       setSuccess(response.data.message);
-      setError('');
+      setUniqueId(response.data.uniqueId); // Save the unique ID
+      setError("");
 
       // Save token to local storage
-      localStorage.setItem('token', response.data.token);
+      localStorage.setItem("token", response.data.token);
 
-      // Redirect to dashboard
-      router.push('/dashboard');
+      // Redirect to dashboard after 2 seconds
+      setTimeout(() => {
+        router.push("/dashboard");
+      }, 1000);
     } catch (err) {
-      setError(err.response?.data?.message || 'Registration failed');
-      console.error('Registration error:', err.response || err.message);
+      setError(err.response?.data?.message || "Registration failed");
+      console.error("Registration error:", err.response || err.message);
     } finally {
       setLoading(false);
     }
@@ -87,14 +97,23 @@ const Registration = () => {
     <div className="max-w-md mx-auto mt-10">
       <h1 className="text-2xl font-bold mb-4">Register</h1>
       {error && <p className="text-red-500 mb-4">{error}</p>}
-      {success && <p className="text-green-500 mb-4">{success}</p>}
+      {success && (
+        <div className="text-green-500 mb-4">
+          <p>{success}</p>
+          {uniqueId && (
+            <p>
+              Your Unique ID: <strong>{uniqueId}</strong>
+            </p>
+          )}
+        </div>
+      )}
       <form onSubmit={handleSubmit} className="space-y-4">
         {/* Toggle Between Personal and Company */}
         <div className="flex items-center justify-between mb-4">
           <label className="text-gray-700">Are you registering as a company?</label>
           <input
             type="checkbox"
-            checked={formData.type === 'company'}
+            checked={formData.type === "company"}
             onChange={handleToggleType}
             className="ml-2"
           />
@@ -103,19 +122,19 @@ const Registration = () => {
         {/* Name or Company Name */}
         <div>
           <label className="block text-gray-700">
-            {formData.type === 'personal' ? 'Name' : 'Company Name'}
+            {formData.type === "personal" ? "Name" : "Company Name"}
           </label>
           <input
             type="text"
-            name={formData.type === 'personal' ? 'name' : 'companyName'}
-            value={formData.type === 'personal' ? formData.name : formData.companyName}
+            name={formData.type === "personal" ? "name" : "companyName"}
+            value={formData.type === "personal" ? formData.name : formData.companyName}
             onChange={handleChange}
             className="w-full border-gray-300 rounded-md p-2"
           />
         </div>
 
         {/* Tax ID (RUC) for Companies */}
-        {formData.type === 'company' && (
+        {formData.type === "company" && (
           <div>
             <label className="block text-gray-700">Tax ID (RUC)</label>
             <input
@@ -146,7 +165,7 @@ const Registration = () => {
           <label className="block text-gray-700">Password</label>
           <div className="relative">
             <input
-              type={showPassword ? 'text' : 'password'}
+              type={showPassword ? "text" : "password"}
               name="password"
               value={formData.password}
               onChange={handleChange}
@@ -157,7 +176,7 @@ const Registration = () => {
               onClick={() => setShowPassword(!showPassword)}
               className="absolute right-2 top-2 text-gray-500"
             >
-              {showPassword ? 'Hide' : 'Show'}
+              {showPassword ? "Hide" : "Show"}
             </button>
           </div>
         </div>
@@ -166,7 +185,7 @@ const Registration = () => {
         <div>
           <label className="block text-gray-700">Confirm Password</label>
           <input
-            type={showPassword ? 'text' : 'password'}
+            type={showPassword ? "text" : "password"}
             name="confirmPassword"
             value={formData.confirmPassword}
             onChange={handleChange}
@@ -180,7 +199,7 @@ const Registration = () => {
           className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"
           disabled={loading}
         >
-          {loading ? 'Registering...' : 'Register'}
+          {loading ? "Registering..." : "Register"}
         </button>
       </form>
     </div>
