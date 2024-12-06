@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const Ad = require("../models/ad");
+const User = require("../models/user"); // Ensure User model is imported
 const protect = require("../middlewares/authMiddleware");
 
 // Create an ad (POST /api/ads)
@@ -18,6 +19,12 @@ router.post("/", protect, async (req, res) => {
         });
 
         await ad.save();
+
+        // Increment the adsPosted count for the user
+        const user = await User.findById(req.user.id);
+        user.adsPosted.push(ad._id); // Add the ad ID to the adsPosted array
+        await user.save();
+
         res.status(201).json({ message: "Ad created successfully", ad });
     } catch (error) {
         console.error("Error creating ad:", error.message);
@@ -82,6 +89,12 @@ router.delete("/:id", protect, async (req, res) => {
         }
 
         await Ad.findByIdAndDelete(req.params.id);
+
+        // Decrement the adsPosted count for the user
+        const user = await User.findById(req.user.id);
+        user.adsPosted = user.adsPosted.filter((adId) => adId.toString() !== req.params.id);
+        await user.save();
+
         console.log("Ad deleted successfully.");
         res.status(200).json({ message: "Ad deleted successfully" });
     } catch (error) {
@@ -116,6 +129,5 @@ router.put("/:id", protect, async (req, res) => {
         res.status(500).json({ message: "Failed to update ad" });
     }
 });
-
 
 module.exports = router;

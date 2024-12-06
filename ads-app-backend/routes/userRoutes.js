@@ -79,7 +79,8 @@ router.get("/me", protect, async (req, res) => {
             phoneNumber: user.phoneNumber,
             type: user.type,
             planType: user.planType,
-            adsPosted: user.adsPosted || [],
+            adsPosted: user.adsPosted.length, // Send the count of ads posted
+//          adsPosted: user.adsPosted || [],
             uniqueId: user.uniqueId, // Include unique ID in the response
         });
     } catch (error) {
