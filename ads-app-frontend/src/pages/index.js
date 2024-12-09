@@ -1,82 +1,57 @@
 import { useEffect, useState } from "react";
-import API from "../services/api"; // Ensure this matches your API service file
+import API from "../services/api";
 
-const Home = () => {
-  const [ads, setAds] = useState([]);
-  const [error, setError] = useState(null);
+const LandingPage = () => {
+    const [ads, setAds] = useState([]);
+    const [error, setError] = useState("");
 
-  // Fetch ads from the backend
-  useEffect(() => {
-    const fetchAds = async () => {
-      try {
-        const response = await API.get("/ads");
-        setAds(response.data); // Update the state with ads
-      } catch (err) {
-        console.error("Error fetching ads:", err.message);
-        setError("Failed to load ads. Please try again.");
-      }
-    };
+    // Fetch all ads on component mount
+    useEffect(() => {
+        const fetchAds = async () => {
+            try {
+                const response = await API.get("/ads"); // Assuming the endpoint returns all ads
+                setAds(response.data);
+            } catch (err) {
+                console.error("Error fetching ads:", err.response?.data || err.message);
+                setError("Failed to load ads. Please try again later.");
+            }
+        };
 
-    fetchAds(); // Call the function to fetch ads
-  }, []);
+        fetchAds();
+    }, []);
 
-  return (
-    <div className="container mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-6">Ads List</h1>
-      {error && <p className="text-red-500">{error}</p>}
-
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {ads.length > 0 ? (
-          ads.map((ad) => (
-            <div
-              key={ad._id}
-              className="bg-white p-4 shadow-md rounded-md border"
-            >
-              {/* Display images */}
-              <div className="ad-images grid grid-cols-1 gap-2">
-                {ad.pictures && ad.pictures.length > 0 ? (
-                  ad.pictures.map((image, index) => (
-                    <img
-                      key={index}
-                      src={image}
-                      alt={`Ad image ${index + 1}`}
-                      className="h-48 w-full object-cover rounded-md"
-                    />
-                  ))
-                ) : (
-                  <img
-                    src="/images/placeholder.png" // Placeholder image if no pictures exist
-                    alt="No image available"
-                    className="h-48 w-full object-cover rounded-md"
-                  />
-                )}
-              </div>
-
-              {/* Ad Details */}
-              <h2 className="text-lg font-bold mt-2">{ad.title}</h2>
-              <p className="text-gray-600">{ad.description}</p>
-              <div className="mt-2 flex justify-between text-sm text-gray-500">
-                <span>{ad.category}</span>
-                {ad.departamento && ad.provincia && ad.distrito ? (
-                  <span>{`${ad.departamento}, ${ad.provincia}, ${ad.distrito}`}</span>
-                ) : (
-                  <span>Location not specified</span>
-                )}
-              </div>
-
-              {/* Additional Details */}
-              <div className="mt-2 text-sm text-gray-500">
-                <p>Views: {ad.views || 0}</p>
-                <p>Favorites: {ad.favoritesCount || 0}</p>
-              </div>
-            </div>
-          ))
-        ) : (
-          <p className="text-gray-500">No ads available yet.</p>
-        )}
-      </div>
-    </div>
-  );
+    return (
+        <div className="container mx-auto p-6">
+            <h1 className="text-3xl font-bold mb-6">Publicaciones</h1>
+            {error && <p className="text-red-500">{error}</p>}
+            {ads.length === 0 ? (
+                <p>No ads available.</p>
+            ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {ads.map((ad) => (
+                        <div key={ad._id} className="border rounded-md shadow-md p-4">
+                            <h2 className="text-xl font-bold mb-2">{ad.title}</h2>
+                            <p className="mb-4">{ad.description}</p>
+                            {ad.pictures && ad.pictures.length > 0 ? (
+                                <div className="flex gap-2 overflow-x-auto">
+                                    {ad.pictures.map((pic, index) => (
+                                        <img
+                                            key={index}
+                                            src={`http://localhost:5000${pic}`}
+                                            alt={`Ad ${index + 1}`}
+                                            className="w-32 h-32 object-cover rounded-md"
+                                        />
+                                    ))}
+                                </div>
+                            ) : (
+                                <p className="text-gray-500">No images available.</p>
+                            )}
+                        </div>
+                    ))}
+                </div>
+            )}
+        </div>
+    );
 };
 
-export default Home;
+export default LandingPage;
