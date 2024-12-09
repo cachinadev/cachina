@@ -1,10 +1,12 @@
-import '../styles/globals.css'; // Tailwind base styles
-import Layout from '../components/Layout';
+import Layout from '../components/Layout'; // Adjust the path based on your project structure
+import '../styles/globals.css'; // Ensure global styles are applied
 
-export default function MyApp({ Component, pageProps }) {
+function MyApp({ Component, pageProps }) {
   return (
     <Layout>
       <Component {...pageProps} />
     </Layout>
   );
 }
+
+export default MyApp;

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { fetchAds } from '../services/api'; // Import your API call
+import { fetchAds } from '../services/api';
 
 const Home = () => {
   const [ads, setAds] = useState([]);
@@ -18,14 +18,14 @@ const Home = () => {
   }, []);
 
   return (
-    <div className="container mx-auto p-4">
+    <div>
       <h1 className="text-2xl font-bold mb-6">Ads List</h1>
       {error && <p className="text-red-500">{error}</p>}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {ads.map((ad) => (
           <div key={ad._id} className="bg-white p-4 shadow-md rounded-md">
             <div className="ad-images grid grid-cols-1 gap-2">
-              {ad.images.length > 0 ? (
+              {ad.images && ad.images.length > 0 ? (
                 ad.images.map((image, index) => (
                   <img
                     key={index}
