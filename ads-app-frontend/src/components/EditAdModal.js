@@ -10,8 +10,8 @@ const EditAdModal = ({ ad, isOpen, onClose, onAdUpdated }) => {
         if (ad) {
             setFormData({ ...ad });
         }
-    }, [ad]);
-//
+    }, [ad]);//
+////
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData({ ...formData, [name]: value });
