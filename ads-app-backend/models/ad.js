@@ -4,7 +4,7 @@ const adSchema = new mongoose.Schema({
     title: { type: String, required: true },
     description: String,
     category: { type: String, required: true },
-    images: [String],
+    pictures: [String],
     location: {
         lat: Number,
         lng: Number,

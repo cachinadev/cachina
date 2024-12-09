@@ -1,6 +1,7 @@
 const express = require("express");
 const connectDB = require("./config/db");
 const cors = require("cors");
+const path = require("path"); // Import the 'path' module
 require("dotenv").config();
 
 const app = express();
@@ -14,10 +15,13 @@ connectDB();
 
 // Routes
 const userRoutes = require("./routes/userRoutes");
-const adRoutes = require("./routes/adRoutes"); // Import adRoutes
+const adRoutes = require("./routes/adRoutes");
 
 app.use("/api/users", userRoutes);
-app.use("/api/ads", adRoutes); // Use adRoutes
+app.use("/api/ads", adRoutes);
+
+// Serve uploaded files statically
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // Start the server
 const PORT = process.env.PORT || 5000;

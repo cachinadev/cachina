@@ -19,8 +19,17 @@ const adSchema = new mongoose.Schema({
     mobiliario: { type: String },
     equipamiento: { type: String },
     servicios: { type: String },
-    pictures: [{ type: String }], // Store image URLs or file paths
-    createdBy: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+    pictures: {
+        type: [String], // Array of strings for image paths
+        default: [], // Initialize with an empty array
+    },
+    createdBy: {
+        type: mongoose.Schema.Types.ObjectId, // Reference to the User model
+        ref: "User",
+        required: true,
+    },
+}, {
+    timestamps: true, // Automatically add `createdAt` and `updatedAt` fields
 });
 
 const Ad = mongoose.model("Ad", adSchema);
