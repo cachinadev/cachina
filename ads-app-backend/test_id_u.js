@@ -1,11 +1,13 @@
 const mongoose = require("mongoose");
 const User = require("./models/user"); // Adjust the path if necessary
+const Ad = require("./models/ad"); // Update the path as necessary
 
 // MongoDB connection
 mongoose
-  .connect("mongodb://localhost:27017/your_database_name")
+  .connect("mongodb://192.168.18.27:27017/cachina")
   .then(() => console.log("MongoDB connected!"))
   .catch((err) => console.error("MongoDB connection error:", err));
+
 
 // Function to generate a unique ID
 const generateUniqueId = () => {

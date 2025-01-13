@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // Base URL for all API calls
-const API_BASE_URL = 'http://localhost:5000/api'; // Ensure this matches your backend URL
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://192.168.18.27:5000/api'; // Default to 192.168.18.27
 
 // Axios instance with interceptors for token handling
 const API = axios.create({
@@ -9,66 +9,141 @@ const API = axios.create({
 });
 
 // Add Authorization header to all requests if a token exists
-API.interceptors.request.use((req) => {
-    const token = localStorage.getItem("token"); // Retrieve token from localStorage
-    if (token) {
-        req.headers.Authorization = `Bearer ${token}`; // Add token to Authorization header
-        console.log("Request headers:", req.headers); // Log headers for debugging
+API.interceptors.request.use(
+    (req) => {
+        const token = localStorage.getItem("token");
+        if (token) {
+            req.headers.Authorization = `Bearer ${token}`;
+        }
+        return req;
+    },
+    (error) => {
+        console.error("Error in request interceptor:", error);
+        return Promise.reject(error);
     }
-    return req;
-});
+);
+
+// Handle responses globally
+API.interceptors.response.use(
+    (response) => response,
+    (error) => {
+        console.error("API Response Error:", {
+            message: error.response?.data?.message || error.message,
+            status: error.response?.status || "No status",
+        });
+        return Promise.reject(error);
+    }
+);
 
 // --- User Functions ---
 
-// Function to register a user
+/**
+ * Register a new user
+ * @param {Object} userData - User registration data
+ * @returns {Promise<Object>} API response data
+ */
 export const registerUser = async (userData) => {
-    const response = await API.post('/users/register', userData);
-    return response.data;
+    const { data } = await API.post('/users/register', userData);
+    return data;
 };
 
-// Function to log in a user
+/**
+ * Log in a user
+ * @param {Object} credentials - User login credentials
+ * @returns {Promise<Object>} API response data
+ */
 export const loginUser = async (credentials) => {
-    const response = await API.post('/users/login', credentials);
-    return response.data;
+    const { data } = await API.post('/users/login', credentials);
+    return data;
 };
 
-// Function to fetch the details of the authenticated user
+/**
+ * Fetch authenticated user's details
+ * @returns {Promise<Object>} User details
+ */
 export const getUserDetails = async () => {
-    const response = await API.get('/users/me');
-    return response.data;
+    const { data } = await API.get('/users/me');
+    return data;
 };
 
 // --- Ad Functions ---
 
-// Function to fetch all ads
+/**
+ * Fetch all ads
+ * @returns {Promise<Array>} List of ads
+ */
 export const fetchAds = async () => {
-    const response = await API.get('/ads');
-    return response.data;
+    const { data } = await API.get('/ads');
+    return data;
 };
 
-// Function to fetch ads created by the authenticated user
+/**
+ * Fetch ads created by the authenticated user
+ * @returns {Promise<Array>} User's ads
+ */
 export const fetchMyAds = async () => {
-    const response = await API.get('/ads/my-ads');
-    return response.data;
+    const { data } = await API.get('/ads/my-ads');
+    return data;
 };
 
-// Function to create a new ad
+/**
+ * Create a new ad
+ * @param {Object} adData - Ad data
+ * @returns {Promise<Object>} Created ad details
+ */
 export const createAd = async (adData) => {
-    const response = await API.post('/ads', adData); // Updated to match RESTful standards
-    return response.data;
+    const formData = new FormData();
+    Object.entries(adData).forEach(([key, value]) => {
+        if (key === "pictures" && Array.isArray(value)) {
+            value.forEach((file) => formData.append("images", file));
+        } else {
+            formData.append(key, value);
+        }
+    });
+
+    const { data } = await API.post('/ads/upload-images', formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+    });
+    return data;
 };
 
-// Function to delete an ad
+/**
+ * Delete an ad
+ * @param {String} adId - Ad ID
+ * @returns {Promise<Object>} API response data
+ */
 export const deleteAd = async (adId) => {
-    const response = await API.delete(`/ads/${adId}`);
-    return response.data;
+    const { data } = await API.delete(`/ads/${adId}`);
+    return data;
 };
 
-// Function to edit/update an ad
+/**
+ * Edit/Update an ad
+ * @param {String} adId - Ad ID
+ * @param {Object} updatedData - Updated ad data
+ * @returns {Promise<Object>} Updated ad details
+ */
 export const editAd = async (adId, updatedData) => {
-    const response = await API.put(`/ads/${adId}`, updatedData);
-    return response.data;
+    const { data } = await API.put(`/ads/${adId}`, updatedData, {
+        headers: { "Content-Type": "application/json" },
+    });
+    return data;
 };
 
-// Export the API instance for direct use
+// Grouped exports for maintainability
+export const UserAPI = {
+    registerUser,
+    loginUser,
+    getUserDetails,
+};
+
+export const AdAPI = {
+    fetchAds,
+    fetchMyAds,
+    createAd,
+    deleteAd,
+    editAd,
+};
+
+// Default Export
 export default API;

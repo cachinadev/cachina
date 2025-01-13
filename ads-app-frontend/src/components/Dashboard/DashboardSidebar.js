@@ -1,0 +1,80 @@
+import React from "react";
+import { FaUserCircle, FaAd, FaPlusCircle, FaSignOutAlt } from "react-icons/fa";
+
+const DashboardSidebar = ({ user, activeTab, setActiveTab, handleLogout }) => {
+  if (!user) {
+    return (
+      <aside className="w-1/4 bg-gray-800 text-white h-screen flex justify-center items-center">
+        <p className="text-gray-400">Loading user details...</p>
+      </aside>
+    );
+  }
+
+  return (
+    <aside className="w-1/4 bg-gray-800 text-white h-screen flex flex-col justify-between">
+      {/* User Info Section */}
+      <div className="p-6">
+        <div className="flex items-center mb-6">
+          <FaUserCircle className="text-4xl text-white mr-3" />
+          <div>
+            <h1 className="text-xl font-bold">{user?.name || "User Name"}</h1>
+            <p className="text-sm text-gray-400">ID: {user?.uniqueId || "N/A"}</p>
+          </div>
+        </div>
+
+        <div className="mb-8">
+          <p className="text-sm text-gray-400 mb-1">Plan:</p>
+          <p className="text-lg font-medium text-green-400">{user?.planType || "N/A"}</p>
+        </div>
+
+        <div className="mb-8">
+          <p className="text-sm text-gray-400 mb-1">Ads Posted:</p>
+          <p className="text-lg font-medium text-yellow-300">
+            {Array.isArray(user?.adsPosted) ? user.adsPosted.length : 0}
+          </p>
+        </div>
+
+        {/* Navigation Links */}
+        <nav className="mt-8">
+          <ul>
+            <li
+              className={`flex items-center gap-3 p-3 rounded-md cursor-pointer ${
+                activeTab === "allAds"
+                  ? "bg-gray-700 text-white"
+                  : "hover:bg-gray-700 hover:text-white"
+              }`}
+              onClick={() => setActiveTab("allAds")}
+            >
+              <FaAd className="text-xl" />
+              <span>All Ads</span>
+            </li>
+            <li
+              className={`flex items-center gap-3 p-3 rounded-md cursor-pointer mt-3 ${
+                activeTab === "createAd"
+                  ? "bg-gray-700 text-white"
+                  : "hover:bg-gray-700 hover:text-white"
+              }`}
+              onClick={() => setActiveTab("createAd")}
+            >
+              <FaPlusCircle className="text-xl" />
+              <span>Create Ad</span>
+            </li>
+          </ul>
+        </nav>
+      </div>
+
+      {/* Logout Button */}
+      <div className="p-6">
+        <button
+          onClick={handleLogout}
+          className="flex items-center gap-3 bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 w-full justify-center"
+        >
+          <FaSignOutAlt className="text-xl" />
+          <span>Logout</span>
+        </button>
+      </div>
+    </aside>
+  );
+};
+
+export default DashboardSidebar;

@@ -28,12 +28,17 @@ const Registration = () => {
     setFormData({
       ...formData,
       type: formData.type === "personal" ? "company" : "personal",
+      name: "", // Reset name field
+      companyName: "", // Reset company name field
+      taxId: "", // Reset tax ID field
     });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+    setError("");
+    setSuccess("");
 
     // Form Validation
     if (formData.password !== formData.confirmPassword) {
@@ -42,20 +47,23 @@ const Registration = () => {
       return;
     }
 
-    if (!formData.name || !formData.phone || !formData.password) {
-      setError("All fields are required");
+    if (formData.type === "personal" && (!formData.name || !formData.phone || !formData.password)) {
+      setError("All fields are required for personal registration");
+      setLoading(false);
+      return;
+    }
+
+    if (
+      formData.type === "company" &&
+      (!formData.companyName || !formData.taxId || !formData.phone || !formData.password)
+    ) {
+      setError("All fields are required for company registration");
       setLoading(false);
       return;
     }
 
     if (formData.phone.length !== 9 || isNaN(formData.phone)) {
       setError("Phone number must be 9 digits");
-      setLoading(false);
-      return;
-    }
-
-    if (formData.type === "company" && !formData.taxId) {
-      setError("Tax ID (RUC) is required for companies");
       setLoading(false);
       return;
     }
@@ -70,16 +78,19 @@ const Registration = () => {
       };
 
       const response = await axios.post(
-        "http://localhost:5000/api/users/register",
+        "http://192.168.18.27:5000/api/users/register",
         payload
       );
 
-      setSuccess(response.data.message);
-      setUniqueId(response.data.uniqueId); // Save the unique ID
-      setError("");
+      const { token, user, message } = response.data;
 
-      // Save token to local storage
-      localStorage.setItem("token", response.data.token);
+      // Save the token and user details to localStorage
+      localStorage.setItem("token", token);
+      localStorage.setItem("user", JSON.stringify(user));
+
+      // Update success message and uniqueId
+      setSuccess(message || "Registration successful!");
+      setUniqueId(user.uniqueId);
 
       // Redirect to dashboard after 2 seconds
       setTimeout(() => {
@@ -87,7 +98,7 @@ const Registration = () => {
       }, 1000);
     } catch (err) {
       setError(err.response?.data?.message || "Registration failed");
-      console.error("Registration error:", err.response || err.message);
+      console.error("Registration error:", err.response?.data || err.message);
     } finally {
       setLoading(false);
     }
@@ -110,13 +121,16 @@ const Registration = () => {
       <form onSubmit={handleSubmit} className="space-y-4">
         {/* Toggle Between Personal and Company */}
         <div className="flex items-center justify-between mb-4">
-          <label className="text-gray-700">Are you registering as a company?</label>
-          <input
-            type="checkbox"
-            checked={formData.type === "company"}
-            onChange={handleToggleType}
-            className="ml-2"
-          />
+          <label className="text-gray-700">Register as a company?</label>
+          <label className="relative inline-flex items-center cursor-pointer">
+            <input
+              type="checkbox"
+              className="sr-only peer"
+              checked={formData.type === "company"}
+              onChange={handleToggleType}
+            />
+            <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer dark:bg-gray-700 peer-checked:bg-blue-600 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:after:translate-x-full peer-checked:after:border-white"></div>
+          </label>
         </div>
 
         {/* Name or Company Name */}
@@ -193,10 +207,9 @@ const Registration = () => {
           />
         </div>
 
-        {/* Submit Button */}
         <button
           type="submit"
-          className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"
+          className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 w-full"
           disabled={loading}
         >
           {loading ? "Registering..." : "Register"}

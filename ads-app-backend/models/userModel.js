@@ -1,36 +1,48 @@
 const mongoose = require("mongoose");
 
-const adSchema = new mongoose.Schema({
-    title: { type: String, required: true },
-    description: { type: String, required: true },
-    category: { type: String },
-    departamento: { type: String },
-    provincia: { type: String },
-    distrito: { type: String },
-    contactNumber: { type: String },
-    cost: { type: Number },
-    currency: { type: String },
-    address: { type: String },
-    googleLink: { type: String },
-    areaTotal: { type: String },
-    habitaciones: { type: Number },
-    planta: { type: Number },
-    bano: { type: String },
-    mobiliario: { type: String },
-    equipamiento: { type: String },
-    servicios: { type: String },
-    pictures: {
-        type: [String], // Array of strings for image paths
-        default: [], // Initialize with an empty array
+// User Schema
+const userSchema = new mongoose.Schema(
+    {
+        name: { type: String, required: true, trim: true }, // User's full name (required)
+        email: {
+            type: String,
+            required: true,
+            unique: true,
+            match: [/.+\@.+\..+/, "Please enter a valid email address"], // Email validation
+        }, // Email (required, unique, validated)
+        password: { type: String, required: true }, // Hashed password (required)
+        phoneNumber: {
+            type: String,
+            required: true,
+            unique: true,
+            match: /^\d{9}$/, // Ensure it's exactly 9 digits
+        }, // Phone number (required, unique, validated)
+        isAdmin: { type: Boolean, default: false }, // Indicates if the user has admin privileges
+        adsPosted: [
+            {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "Ad", // Reference to the Ad model
+            },
+        ], // List of ads created by the user
+        profilePicture: { type: String, default: "" }, // Profile picture URL (optional)
+        address: {
+            departamento: { type: String, trim: true }, // Department (optional)
+            provincia: { type: String, trim: true }, // Province (optional)
+            distrito: { type: String, trim: true }, // District (optional)
+        }, // Address details
+        resetToken: { type: String }, // For password reset functionality (optional)
+        tokenExpiry: { type: Date }, // Expiry time for the reset token (optional)
     },
-    createdBy: {
-        type: mongoose.Schema.Types.ObjectId, // Reference to the User model
-        ref: "User",
-        required: true,
-    },
-}, {
-    timestamps: true, // Automatically add `createdAt` and `updatedAt` fields
-});
+    {
+        timestamps: true, // Automatically add `createdAt` and `updatedAt` fields
+    }
+);
 
-const Ad = mongoose.model("Ad", adSchema);
-module.exports = Ad;
+// Add an index for faster queries on email and phoneNumber
+userSchema.index({ email: 1 });
+userSchema.index({ phoneNumber: 1 });
+
+// Create the User model
+const User = mongoose.model("User", userSchema);
+
+module.exports = User;
