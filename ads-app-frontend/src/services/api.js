@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // Base URL for all API calls
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://192.168.18.27:5000/api'; // Default to 192.168.18.27
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'; // Default to localhost
 
 // Axios instance with interceptors for token handling
 const API = axios.create({

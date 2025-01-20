@@ -13,80 +13,113 @@ const Login = () => {
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
-      router.push("/dashboard"); // Redirect to the dashboard if already logged in
+      router.push("/dashboard");
     }
   }, []);
 
   // Handle input changes
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  // Validate form fields
+  const validateForm = () => {
+    if (!formData.phoneNumber || !formData.password) {
+      setError("Please fill in all fields.");
+      return false;
+    }
+    if (!/^\d{9}$/.test(formData.phoneNumber)) {
+      setError("Phone number must be exactly 9 digits.");
+      return false;
+    }
+    if (formData.password.length < 6) {
+      setError("Password must be at least 6 characters.");
+      return false;
+    }
+    setError("");
+    return true;
   };
 
   // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
+    if (!validateForm()) return;
 
-    // Basic validation
-    if (!formData.phoneNumber || !formData.password) {
-      setError("Please fill in all fields.");
-      setLoading(false);
-      return;
-    }
+    setLoading(true);
+    setError("");
+    setSuccess("");
 
     try {
-      const response = await axios.post("http://192.168.18.27:5000/api/users/login", formData);
+      const response = await axios.post("http://localhost:5000/api/users/login", formData);
 
       const { token, user } = response.data;
 
-      // Save the token and user details to localStorage
+      // Save token and user details to localStorage
       localStorage.setItem("token", token);
       localStorage.setItem("user", JSON.stringify(user));
 
-      // Redirect to dashboard
-      router.push("/dashboard");
+      setSuccess("Login successful! Redirecting...");
+      setTimeout(() => router.push("/dashboard"), 1500);
     } catch (err) {
-      setError(err.response?.data?.message || "Login failed");
-      console.error("Login error:", err.response || err.message);
+      setError(err.response?.data?.message || "Login failed. Please try again.");
+      console.error("Login error:", err.response?.data || err.message);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="max-w-md mx-auto mt-10">
-      <h1 className="text-2xl font-bold mb-4">Login</h1>
-      {error && <p className="text-red-500 mb-4">{error}</p>}
+    <div className="max-w-md mx-auto mt-10 p-6 border rounded-lg shadow-lg bg-white">
+      <h1 className="text-3xl font-bold text-center text-gray-800 mb-6">Login</h1>
+
+      {error && <p className="text-red-500 text-center mb-4">{error}</p>}
+      {success && <p className="text-green-500 text-center mb-4">{success}</p>}
+
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label className="block text-gray-700">Phone Number</label>
+          <label className="block text-gray-700 font-semibold">Phone Number</label>
           <input
             type="text"
             name="phoneNumber"
             value={formData.phoneNumber}
             onChange={handleChange}
-            className="w-full border-gray-300 rounded-md p-2"
+            maxLength="9"
+            placeholder="Enter your 9-digit phone number"
+            className="w-full border border-gray-300 rounded-md p-3 focus:ring-2 focus:ring-blue-500"
+            required
           />
         </div>
         <div>
-          <label className="block text-gray-700">Password</label>
+          <label className="block text-gray-700 font-semibold">Password</label>
           <input
             type="password"
             name="password"
             value={formData.password}
             onChange={handleChange}
-            className="w-full border-gray-300 rounded-md p-2"
+            placeholder="Enter your password"
+            className="w-full border border-gray-300 rounded-md p-3 focus:ring-2 focus:ring-blue-500"
+            required
           />
         </div>
+
         <button
           type="submit"
-          className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"
+          className={`w-full bg-blue-500 text-white px-4 py-3 rounded-md font-semibold transition duration-200 ${
+            loading ? "cursor-not-allowed opacity-75" : "hover:bg-blue-600"
+          }`}
           disabled={loading}
         >
           {loading ? "Logging in..." : "Login"}
         </button>
       </form>
+
+      <p className="text-center text-gray-500 mt-4">
+        Don't have an account?{" "}
+        <a href="/register" className="text-blue-500 hover:underline">
+          Register here
+        </a>
+      </p>
     </div>
   );
 };

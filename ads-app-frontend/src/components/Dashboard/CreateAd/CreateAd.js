@@ -11,6 +11,7 @@ const CreateAd = ({ fetchUserDetails, fetchUserAds }) => {
         departamento: "",
         provincia: "",
         distrito: "",
+        dirección: "",
         contactNumber: "",
         cost: "",
         currency: "Soles",
@@ -100,7 +101,7 @@ const CreateAd = ({ fetchUserDetails, fetchUserAds }) => {
 
     return (
         <form onSubmit={handleSubmit} className="space-y-6 bg-white p-6 rounded shadow-md">
-            <h1 className="text-2xl font-bold mb-4">Create New Ad</h1>
+            <h1 className="text-2xl font-bold mb-4">Muestra tu negocio & servicio</h1>
 
             {error && <p className="text-red-500 mb-4">{error}</p>}
             {success && <p className="text-green-500 mb-4">{success}</p>}

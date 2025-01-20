@@ -78,7 +78,7 @@ const Registration = () => {
       };
 
       const response = await axios.post(
-        "http://192.168.18.27:5000/api/users/register",
+        "http://localhost:5000/api/users/register",
         payload
       );
 

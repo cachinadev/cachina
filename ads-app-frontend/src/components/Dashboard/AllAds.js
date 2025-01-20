@@ -56,7 +56,7 @@ const AllAds = ({ ads, setAds, fetchUserDetails }) => {
                   {ad.pictures.map((pic, index) => (
                     <img
                       key={index}
-                      src={`http://192.168.18.27:5000${pic}`} // Full path to image
+                      src={`http://localhost:5000${pic}`} // Full path to image
                       alt={`Ad ${index + 1}`}
                       className="w-24 h-24 object-cover rounded-md"
                     />

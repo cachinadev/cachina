@@ -20,6 +20,8 @@ const adSchema = new mongoose.Schema(
         departamento: { type: String, trim: true }, // Department
         provincia: { type: String, trim: true }, // Province
         distrito: { type: String, trim: true }, // District
+        dirección: { type: String, maxlength: 255, trim: true, default: "" }, // Equipment description
+
         location: {
             lat: { type: Number }, // Latitude (optional)
             lng: { type: Number }, // Longitude (optional)
