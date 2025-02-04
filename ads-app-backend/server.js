@@ -2,6 +2,7 @@ const express = require("express");
 const connectDB = require("./config/db");
 const cors = require("cors");
 const path = require("path");
+
 require("dotenv").config();
 
 const app = express();
@@ -16,9 +17,11 @@ connectDB();
 // Routes
 const userRoutes = require("./routes/userRoutes");
 const adRoutes = require("./routes/adRoutes");
+const reviewRoutes = require('./routes/reviewRoutes'); // Import review routes
 
 app.use("/api/users", userRoutes);
 app.use("/api/ads", adRoutes);
+app.use("/api/ads", reviewRoutes); // Move this ABOVE the 404 handler
 
 // Serve uploaded files statically
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
@@ -34,7 +37,7 @@ app.use((err, req, res, next) => {
     res.status(500).json({ message: "Internal server error", error: err.message });
 });
 
-// Handle undefined routes
+// Handle undefined routes (404)
 app.use((req, res) => {
     res.status(404).json({ message: "API endpoint not found" });
 });

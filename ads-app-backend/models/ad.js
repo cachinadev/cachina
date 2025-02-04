@@ -56,6 +56,32 @@ const adSchema = new mongoose.Schema(
         availableHours: { type: String, trim: true, default: "" }, // Available hours
         googleLink: { type: String, trim: true, default: "" }, // Google Maps link (optional)
         website: { type: String, trim: true, default: "" }, // Optional website or social media link
+
+        // Review System
+        reviews: [
+            {
+                user: {
+                    type: mongoose.Schema.Types.ObjectId,
+                    ref: "User",
+                    required: true
+                },
+                rating: {
+                    type: Number,
+                    required: true,
+                    min: 1,
+                    max: 5
+                },
+                comment: {
+                    type: String,
+                    required: true,
+                    trim: true
+                },
+                createdAt: {
+                    type: Date,
+                    default: Date.now
+                }
+            }
+        ]
     },
     {
         timestamps: true, // Automatically add `createdAt` and `updatedAt` fields

@@ -1,11 +1,11 @@
-import Layout from '../components/Layout'; // Adjust path based on your project structure
-import '../styles/globals.css'; // Ensure global styles are applied
+import Layout from '../components/Layout';
+import '../styles/globals.css';
 import Head from 'next/head';
 import { useEffect } from 'react';
+import { AuthProvider } from '../context/AuthContext'; // Import AuthProvider
 
 function MyApp({ Component, pageProps }) {
   useEffect(() => {
-    // Fix for leaflet default icon paths if using maps across the app
     import("leaflet").then((L) => {
       delete L.Icon.Default.prototype._getIconUrl;
       L.Icon.Default.mergeOptions({
@@ -31,9 +31,11 @@ function MyApp({ Component, pageProps }) {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <Layout>
-        <Component {...pageProps} />
-      </Layout>
+      <AuthProvider> {/* Wrap the app with AuthProvider */}
+        <Layout>
+          <Component {...pageProps} />
+        </Layout>
+      </AuthProvider>
     </>
   );
 }

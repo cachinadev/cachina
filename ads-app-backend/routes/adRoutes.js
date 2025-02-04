@@ -170,17 +170,93 @@ router.delete("/:id", protect, async (req, res) => {
     }
 });
 
-// Fetch ad details by ID
+// Fetch ad details by ID and increment view count
 router.get("/:id", async (req, res) => {
     try {
         const ad = await Ad.findById(req.params.id).populate("createdBy", "name email");
         if (!ad) {
             return res.status(404).json({ message: "Ad not found" });
         }
+
+        // Increment the views count
+        ad.views += 1;
+        await ad.save();
+
         res.status(200).json(ad);
     } catch (error) {
         console.error("Error fetching ad details:", error.message);
         res.status(500).json({ message: "Server error" });
+    }
+});
+
+// Add a review to an ad
+router.post("/:adId/reviews", protect, async (req, res) => {
+    try {
+        const { rating, comment } = req.body;
+        const ad = await Ad.findById(req.params.adId);
+
+        if (!ad) {
+            return res.status(404).json({ message: "Ad not found" });
+        }
+
+        const newReview = {
+            user: req.user._id,
+            rating,
+            comment,
+        };
+
+        ad.reviews.push(newReview);
+        await ad.save();
+
+        res.status(201).json({ message: "Review added successfully", review: newReview });
+    } catch (error) {
+        console.error("Error adding review:", error);
+        res.status(500).json({ message: "Failed to add review" });
+    }
+});
+
+// Get all reviews for an ad
+router.get("/:adId/reviews", async (req, res) => {
+    try {
+        const ad = await Ad.findById(req.params.adId).populate("reviews.user", "name");
+
+        if (!ad) {
+            return res.status(404).json({ message: "Ad not found" });
+        }
+
+        res.status(200).json(ad.reviews);
+    } catch (error) {
+        console.error("Error fetching reviews:", error);
+        res.status(500).json({ message: "Failed to fetch reviews" });
+    }
+});
+
+// Delete a review (only by the review owner)
+router.delete("/:adId/reviews/:reviewId", protect, async (req, res) => {
+    try {
+        const ad = await Ad.findById(req.params.adId);
+
+        if (!ad) {
+            return res.status(404).json({ message: "Ad not found" });
+        }
+
+        const review = ad.reviews.id(req.params.reviewId);
+
+        if (!review) {
+            return res.status(404).json({ message: "Review not found" });
+        }
+
+        if (review.user.toString() !== req.user._id.toString()) {
+            return res.status(403).json({ message: "Not authorized to delete this review" });
+        }
+
+        review.remove();
+        await ad.save();
+
+        res.status(200).json({ message: "Review deleted successfully" });
+    } catch (error) {
+        console.error("Error deleting review:", error);
+        res.status(500).json({ message: "Failed to delete review" });
     }
 });
 

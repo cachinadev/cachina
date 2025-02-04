@@ -18,6 +18,7 @@ const CreateAd = ({ fetchUserDetails, fetchUserAds }) => {
         address: "",
         googleLink: "",
         pictures: [],
+        types: [],
         deporteType: [],
         facilities: "",
         availableHours: "",

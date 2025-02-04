@@ -2,8 +2,9 @@ import DashboardSidebar from "./DashboardSidebar";
 import React from "react";
 import AllAds from "./AllAds";
 import CreateAd from "./CreateAd/CreateAd";
+import Favorites from "../Favorites"; // Import the new Favorites component
 
-const DashboardMain = ({ activeTab, ads, setAds, fetchUserDetails, fetchUserAds }) => {
+const DashboardMain = ({ activeTab, ads, setAds, fetchUserDetails, fetchUserAds, favorites }) => {
   return (
     <div className="flex-1 bg-gray-100 p-6">
       {activeTab === "allAds" && (
@@ -12,9 +13,11 @@ const DashboardMain = ({ activeTab, ads, setAds, fetchUserDetails, fetchUserAds 
       {activeTab === "createAd" && (
         <CreateAd fetchUserDetails={fetchUserDetails} fetchUserAds={fetchUserAds} />
       )}
+      {activeTab === "favorites" && (
+        <Favorites favorites={favorites} />
+      )}
     </div>
   );
 };
 
 export default DashboardMain;
-

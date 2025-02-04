@@ -24,6 +24,12 @@ const userSchema = new mongoose.Schema(
                 ref: "Ad", // Reference to the Ad model
             },
         ], // List of ads created by the user
+        favorites: [
+            {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "Ad", // Reference to the Ad model for favorite ads
+            },
+        ], // List of favorite ads
         profilePicture: { type: String, default: "" }, // Profile picture URL (optional)
         address: {
             departamento: { type: String, trim: true }, // Department (optional)

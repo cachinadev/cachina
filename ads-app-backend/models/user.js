@@ -22,15 +22,41 @@ const userSchema = new mongoose.Schema({
         type: String,
         default: "free",
     },
-    adsPosted: {
-        type: Array,
-        default: [],
-    },
-
     uniqueId: { 
         type: String, 
-        required: true, unique: true },
-
+        required: true, 
+        unique: true 
+    },
+    adsPosted: [{ 
+        type: mongoose.Schema.Types.ObjectId, 
+        ref: "Ad" 
+    }],
+    favorites: [{ 
+        type: mongoose.Schema.Types.ObjectId, 
+        ref: "Ad" 
+    }],
+    reviews: [{
+        ad: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Ad",
+            required: true
+        },
+        rating: {
+            type: Number,
+            required: true,
+            min: 1,
+            max: 5
+        },
+        comment: {
+            type: String,
+            required: true,
+            trim: true
+        },
+        createdAt: {
+            type: Date,
+            default: Date.now
+        }
+    }]
 });
 
 module.exports = mongoose.model("User", userSchema);

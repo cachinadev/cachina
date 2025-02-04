@@ -37,60 +37,79 @@ API.interceptors.response.use(
 
 // --- User Functions ---
 
-/**
- * Register a new user
- * @param {Object} userData - User registration data
- * @returns {Promise<Object>} API response data
- */
 export const registerUser = async (userData) => {
     const { data } = await API.post('/users/register', userData);
     return data;
 };
 
-/**
- * Log in a user
- * @param {Object} credentials - User login credentials
- * @returns {Promise<Object>} API response data
- */
 export const loginUser = async (credentials) => {
     const { data } = await API.post('/users/login', credentials);
     return data;
 };
 
-/**
- * Fetch authenticated user's details
- * @returns {Promise<Object>} User details
- */
 export const getUserDetails = async () => {
     const { data } = await API.get('/users/me');
     return data;
 };
 
+export const addToFavorites = async (adId) => {
+    try {
+        const { data } = await API.post(`/users/favorites/${adId}`);
+        return data;
+    } catch (error) {
+        if (error.response && error.response.status === 401) {
+            console.warn("You must be logged in to add favorites.");
+            return null; // Return null for unauthenticated users
+        }
+        throw error;
+    }
+};
+
+export const removeFromFavorites = async (adId) => {
+    try {
+        const { data } = await API.delete(`/users/favorites/${adId}`);
+        return data;
+    } catch (error) {
+        if (error.response && error.response.status === 401) {
+            console.warn("You must be logged in to remove favorites.");
+            return null; // Return null for unauthenticated users
+        }
+        throw error;
+    }
+};
+
+// Get all favorite ads
+export const getFavorites = async () => {
+    try {
+        const { data } = await API.get("/users/favorites");
+        return data;
+    } catch (error) {
+        if (error.response && error.response.status === 401) {
+            // Return an empty list if the user is not authorized
+            return [];
+        }
+        throw error; // Re-throw other errors
+    }
+};
+
+
 // --- Ad Functions ---
 
-/**
- * Fetch all ads
- * @returns {Promise<Array>} List of ads
- */
 export const fetchAds = async () => {
     const { data } = await API.get('/ads');
     return data;
 };
 
-/**
- * Fetch ads created by the authenticated user
- * @returns {Promise<Array>} User's ads
- */
 export const fetchMyAds = async () => {
     const { data } = await API.get('/ads/my-ads');
     return data;
 };
 
-/**
- * Create a new ad
- * @param {Object} adData - Ad data
- * @returns {Promise<Object>} Created ad details
- */
+export const getAdDetails = async (adId) => {
+    const { data } = await API.get(`/ads/${adId}`);
+    return data;
+};
+
 export const createAd = async (adData) => {
     const formData = new FormData();
     Object.entries(adData).forEach(([key, value]) => {
@@ -107,26 +126,32 @@ export const createAd = async (adData) => {
     return data;
 };
 
-/**
- * Delete an ad
- * @param {String} adId - Ad ID
- * @returns {Promise<Object>} API response data
- */
 export const deleteAd = async (adId) => {
     const { data } = await API.delete(`/ads/${adId}`);
     return data;
 };
 
-/**
- * Edit/Update an ad
- * @param {String} adId - Ad ID
- * @param {Object} updatedData - Updated ad data
- * @returns {Promise<Object>} Updated ad details
- */
 export const editAd = async (adId, updatedData) => {
     const { data } = await API.put(`/ads/${adId}`, updatedData, {
         headers: { "Content-Type": "application/json" },
     });
+    return data;
+};
+
+// --- Review Functions ---
+
+export const addReview = async (adId, reviewData) => {
+    const { data } = await API.post(`/ads/${adId}/reviews`, reviewData);
+    return data;
+};
+
+export const getReviews = async (adId) => {
+    const { data } = await API.get(`/ads/${adId}/reviews`);
+    return data;
+};
+
+export const deleteReview = async (reviewId) => {
+    const { data } = await API.delete(`/ads/reviews/${reviewId}`);
     return data;
 };
 
@@ -135,14 +160,21 @@ export const UserAPI = {
     registerUser,
     loginUser,
     getUserDetails,
+    addToFavorites,
+    removeFromFavorites,
+    getFavorites,
 };
 
 export const AdAPI = {
     fetchAds,
     fetchMyAds,
+    getAdDetails,
     createAd,
     deleteAd,
     editAd,
+    addReview,
+    getReviews,
+    deleteReview,
 };
 
 // Default Export

@@ -1,7 +1,29 @@
-import React from "react";
-import { FaUserCircle, FaAd, FaPlusCircle, FaSignOutAlt } from "react-icons/fa";
+import React, { useEffect, useState } from "react";
+import { FaUserCircle, FaAd, FaPlusCircle, FaSignOutAlt, FaHeart } from "react-icons/fa";
+import { getFavorites, getUserDetails } from "../../services/api";
 
 const DashboardSidebar = ({ user, activeTab, setActiveTab, handleLogout }) => {
+  const [favorites, setFavorites] = useState([]);
+  const [adsPostedCount, setAdsPostedCount] = useState(0); // Add state for ads count
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const userDetails = await getUserDetails();
+        setAdsPostedCount(userDetails.adsPosted.length); // Update ads posted count
+
+        const favoriteAds = await getFavorites();
+        setFavorites(favoriteAds);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    if (user) {
+      fetchData();
+    }
+  }, [user]);
+
   if (!user) {
     return (
       <aside className="w-1/4 bg-gray-800 text-white h-screen flex justify-center items-center">
@@ -12,7 +34,6 @@ const DashboardSidebar = ({ user, activeTab, setActiveTab, handleLogout }) => {
 
   return (
     <aside className="w-1/4 bg-gray-800 text-white h-screen flex flex-col justify-between">
-      {/* User Info Section */}
       <div className="p-6">
         <div className="flex items-center mb-6">
           <FaUserCircle className="text-4xl text-white mr-3" />
@@ -30,7 +51,7 @@ const DashboardSidebar = ({ user, activeTab, setActiveTab, handleLogout }) => {
         <div className="mb-8">
           <p className="text-sm text-gray-400 mb-1">Ads Posted:</p>
           <p className="text-lg font-medium text-yellow-300">
-            {Array.isArray(user?.adsPosted) ? user.adsPosted.length : 0}
+            {adsPostedCount}
           </p>
         </div>
 
@@ -58,6 +79,17 @@ const DashboardSidebar = ({ user, activeTab, setActiveTab, handleLogout }) => {
             >
               <FaPlusCircle className="text-xl" />
               <span>Create Ad</span>
+            </li>
+            <li
+              className={`flex items-center gap-3 p-3 rounded-md cursor-pointer mt-3 ${
+                activeTab === "favorites"
+                  ? "bg-gray-700 text-white"
+                  : "hover:bg-gray-700 hover:text-white"
+              }`}
+              onClick={() => setActiveTab("favorites")}
+            >
+              <FaHeart className="text-xl text-red-500" />
+              <span>Favorites ({favorites.length})</span>
             </li>
           </ul>
         </nav>

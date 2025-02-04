@@ -69,19 +69,24 @@ router.get("/", async (req, res) => {
 // Fetch logged-in user details
 router.get("/me", protect, async (req, res) => {
     try {
-        const user = await User.findById(req.user.id).select("-password");
+        // Populate the adsPosted field to fetch actual ad details
+        const user = await User.findById(req.user.id)
+            .select("-password")
+            .populate("adsPosted");
+
         if (!user) {
             return res.status(404).json({ message: "User not found" });
         }
+
         res.status(200).json({
             id: user._id,
             name: user.name,
             phoneNumber: user.phoneNumber,
             type: user.type,
             planType: user.planType,
-            adsPosted: user.adsPosted.length, // Send the count of ads posted
-//          adsPosted: user.adsPosted || [],
-            uniqueId: user.uniqueId, // Include unique ID in the response
+            adsPostedCount: user.adsPosted.length, // Send the count of ads posted
+            adsPosted: user.adsPosted,             // Send the actual ads
+            uniqueId: user.uniqueId,               // Include unique ID in the response
         });
     } catch (error) {
         console.error("Error fetching user details:", error);
@@ -128,5 +133,59 @@ router.post("/login", async (req, res) => {
         res.status(500).json({ message: "Server error. Please try again later." });
     }
 });
+
+// Add an ad to favorites
+router.post("/favorites/:adId", protect, async (req, res) => {
+    try {
+        const user = await User.findById(req.user.id);
+        const { adId } = req.params;
+
+        if (!user.favorites.includes(adId)) {
+            user.favorites.push(adId);
+            await user.save();
+            res.status(200).json({ message: "Ad added to favorites" });
+        } else {
+            res.status(400).json({ message: "Ad already in favorites" });
+        }
+    } catch (error) {
+        console.error("Error adding to favorites:", error);
+        res.status(500).json({ message: "Failed to add to favorites" });
+    }
+});
+
+// Remove an ad from favorites
+router.delete("/favorites/:adId", protect, async (req, res) => {
+    try {
+        const user = await User.findById(req.user.id);
+        const { adId } = req.params;
+
+        user.favorites = user.favorites.filter(fav => fav.toString() !== adId);
+        await user.save();
+        res.status(200).json({ message: "Ad removed from favorites" });
+    } catch (error) {
+        console.error("Error removing from favorites:", error);
+        res.status(500).json({ message: "Failed to remove from favorites" });
+    }
+});
+
+// Fetch user's favorite ads
+router.get("/favorites", protect, async (req, res) => {
+    try {
+        const user = await User.findById(req.user.id).populate({
+            path: "favorites",
+            model: "Ad"
+        });
+
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        res.status(200).json(user.favorites);
+    } catch (error) {
+        console.error("Error fetching favorites:", error);
+        res.status(500).json({ message: "Failed to fetch favorites" });
+    }
+});
+
 
 module.exports = router;
