@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { FaUserCircle, FaAd, FaPlusCircle, FaSignOutAlt, FaHeart } from "react-icons/fa";
+import { FaUserCircle, FaChartBar, FaAd, FaPlusCircle, FaSignOutAlt, FaHeart } from "react-icons/fa";
 import { getFavorites, getUserDetails } from "../../services/api";
 
 const DashboardSidebar = ({ user, activeTab, setActiveTab, handleLogout }) => {
@@ -91,6 +91,18 @@ const DashboardSidebar = ({ user, activeTab, setActiveTab, handleLogout }) => {
               <FaHeart className="text-xl text-red-500" />
               <span>Favorites ({favorites.length})</span>
             </li>
+
+            <li
+              className={`flex items-center gap-3 p-3 rounded-md cursor-pointer mt-3 ${
+                  activeTab === "analytics"
+                      ? "bg-gray-700 text-white"
+                      : "hover:bg-gray-700 hover:text-white"
+              }`}
+              onClick={() => setActiveTab("analytics")} >
+              <FaChartBar className="text-xl" />
+              <span>Ad Analytics</span>
+            </li>
+            
           </ul>
         </nav>
       </div>

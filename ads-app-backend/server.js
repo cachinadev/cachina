@@ -20,8 +20,8 @@ const adRoutes = require("./routes/adRoutes");
 const reviewRoutes = require('./routes/reviewRoutes'); // Import review routes
 
 app.use("/api/users", userRoutes);
+app.use("/api/ads", reviewRoutes); // Place review routes before adRoutes to avoid route conflicts
 app.use("/api/ads", adRoutes);
-app.use("/api/ads", reviewRoutes); // Move this ABOVE the 404 handler
 
 // Serve uploaded files statically
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));

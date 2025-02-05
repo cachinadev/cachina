@@ -6,6 +6,28 @@ const protect = require("../middlewares/authMiddleware");
 const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
+const mongoose = require("mongoose");
+const axios = require("axios");
+
+
+// Analytics Route (Static Route Comes First)
+router.get("/analytics", protect, async (req, res) => {
+    try {
+        const ads = await Ad.find({ createdBy: req.user.id });
+
+        const analytics = ads.map(ad => ({
+            title: ad.title,
+            views: ad.views,
+            favorites: ad.favoritesCount,
+            engagementRate: ad.views > 0 ? ((ad.favoritesCount / ad.views) * 100).toFixed(2) : "0.00"
+        }));
+
+        res.status(200).json(analytics);
+    } catch (error) {
+        console.error("Error fetching analytics:", error);
+        res.status(500).json({ message: "Server error", error: error.message });
+    }
+});
 
 // Multer configuration for image uploads
 const storage = multer.diskStorage({
@@ -257,6 +279,20 @@ router.delete("/:adId/reviews/:reviewId", protect, async (req, res) => {
     } catch (error) {
         console.error("Error deleting review:", error);
         res.status(500).json({ message: "Failed to delete review" });
+    }
+});
+
+// ✅ Keep dynamic routes AFTER fixed routes
+router.get("/:id", async (req, res) => {
+    try {
+        const ad = await Ad.findById(req.params.id);
+        if (!ad) {
+            return res.status(404).json({ message: "Ad not found" });
+        }
+        res.status(200).json(ad);
+    } catch (error) {
+        console.error("Error fetching ad details:", error);
+        res.status(500).json({ message: "Server error", error: error.message });
     }
 });
 

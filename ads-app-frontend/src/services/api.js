@@ -1,14 +1,14 @@
 import axios from 'axios';
 
 // Base URL for all API calls
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'; // Default to localhost
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
 
 // Axios instance with interceptors for token handling
 const API = axios.create({
     baseURL: API_BASE_URL,
 });
 
-// Add Authorization header to all requests if a token exists
+// Request Interceptor: Add Authorization header if token exists
 API.interceptors.request.use(
     (req) => {
         const token = localStorage.getItem("token");
@@ -23,7 +23,7 @@ API.interceptors.request.use(
     }
 );
 
-// Handle responses globally
+// Response Interceptor: Global error handling
 API.interceptors.response.use(
     (response) => response,
     (error) => {
@@ -35,7 +35,7 @@ API.interceptors.response.use(
     }
 );
 
-// --- User Functions ---
+// ---------------- USER FUNCTIONS ----------------
 
 export const registerUser = async (userData) => {
     const { data } = await API.post('/users/register', userData);
@@ -52,11 +52,13 @@ export const getUserDetails = async () => {
     return data;
 };
 
+// Add to Favorites
 export const addToFavorites = async (adId) => {
     try {
         const { data } = await API.post(`/users/favorites/${adId}`);
         return data;
     } catch (error) {
+        console.error("Error adding to favorites:", error.response?.data || error.message);
         if (error.response && error.response.status === 401) {
             console.warn("You must be logged in to add favorites.");
             return null; // Return null for unauthenticated users
@@ -65,35 +67,38 @@ export const addToFavorites = async (adId) => {
     }
 };
 
+// Remove from Favorites
 export const removeFromFavorites = async (adId) => {
     try {
         const { data } = await API.delete(`/users/favorites/${adId}`);
         return data;
     } catch (error) {
+        console.error("Error removing from favorites:", error.response?.data || error.message);
         if (error.response && error.response.status === 401) {
             console.warn("You must be logged in to remove favorites.");
-            return null; // Return null for unauthenticated users
+            return null;
         }
         throw error;
     }
 };
 
-// Get all favorite ads
+// Get All Favorites
 export const getFavorites = async () => {
     try {
+        const token = localStorage.getItem("token");
+        if (!token) {
+            return []; // Return an empty array if the user is not logged in
+        }
+
         const { data } = await API.get("/users/favorites");
         return data;
     } catch (error) {
-        if (error.response && error.response.status === 401) {
-            // Return an empty list if the user is not authorized
-            return [];
-        }
-        throw error; // Re-throw other errors
+        console.error("Error fetching favorites:", error.response?.data || error.message);
+        return []; // Return an empty array if there's an error
     }
 };
 
-
-// --- Ad Functions ---
+// ---------------- AD FUNCTIONS ----------------
 
 export const fetchAds = async () => {
     const { data } = await API.get('/ads');
@@ -138,7 +143,7 @@ export const editAd = async (adId, updatedData) => {
     return data;
 };
 
-// --- Review Functions ---
+// ---------------- REVIEW FUNCTIONS ----------------
 
 export const addReview = async (adId, reviewData) => {
     const { data } = await API.post(`/ads/${adId}/reviews`, reviewData);
@@ -150,19 +155,20 @@ export const getReviews = async (adId) => {
     return data;
 };
 
-export const deleteReview = async (reviewId) => {
-    const { data } = await API.delete(`/ads/reviews/${reviewId}`);
+export const deleteReview = async (adId, reviewId) => {
+    const { data } = await API.delete(`/ads/${adId}/reviews/${reviewId}`);
     return data;
 };
 
-// Grouped exports for maintainability
+// ---------------- EXPORT GROUPS ----------------
+
 export const UserAPI = {
     registerUser,
     loginUser,
     getUserDetails,
     addToFavorites,
     removeFromFavorites,
-    getFavorites,
+    getFavorites, // ✅ Ensure this is included
 };
 
 export const AdAPI = {

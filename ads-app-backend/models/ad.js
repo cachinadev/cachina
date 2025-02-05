@@ -1,61 +1,76 @@
 const mongoose = require("mongoose");
 
+const interactionSchema = new mongoose.Schema({
+    ip: String,
+    location: {
+        city: String,
+        region: String,
+        country: String,
+        latitude: Number,
+        longitude: Number,
+    },
+    timestamp: {
+        type: Date,
+        default: Date.now,
+    },
+});
+
 const adSchema = new mongoose.Schema(
     {
         // Common fields
-        title: { type: String, required: true, trim: true }, // Ad title (required, trimmed)
-        description: { type: String, required: true, trim: true }, // Description (required, trimmed)
-        category: { type: String, required: true, trim: true }, // Category (required, trimmed)
-        pictures: { type: [String], default: [] }, // Array of image paths
-        views: { type: Number, default: 0 }, // Number of views
-        favoritesCount: { type: Number, default: 0 }, // Number of favorites
+        title: { type: String, required: true, trim: true },
+        description: { type: String, required: true, trim: true },
+        category: { type: String, required: true, trim: true },
+        pictures: { type: [String], default: [] },
+        views: { type: Number, default: 0 },
+        favoritesCount: { type: Number, default: 0 },
         createdBy: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "User",
             required: true,
-        }, // Reference to the User model
-        isPremium: { type: Boolean, default: false }, // Indicates premium ad status
+        },
+        isPremium: { type: Boolean, default: false },
 
         // Location fields
-        departamento: { type: String, trim: true }, // Department
-        provincia: { type: String, trim: true }, // Province
-        distrito: { type: String, trim: true }, // District
-        dirección: { type: String, maxlength: 255, trim: true, default: "" }, // Equipment description
+        departamento: { type: String, trim: true },
+        provincia: { type: String, trim: true },
+        distrito: { type: String, trim: true },
+        dirección: { type: String, maxlength: 255, trim: true, default: "" },
 
         location: {
-            lat: { type: Number }, // Latitude (optional)
-            lng: { type: Number }, // Longitude (optional)
+            lat: { type: Number },
+            lng: { type: Number },
         },
 
         // Contact and cost
         contactNumber: {
             type: String,
             required: true,
-            match: /^\d{9}$/, // Ensure it's exactly 9 digits
+            match: /^\d{9}$/,
             trim: true,
-        }, // Contact number (required, validated, trimmed)
-        cost: { type: Number, min: 0, default: null }, // Cost (optional, minimum 0)
-        currency: { type: String, enum: ["Soles", "Dollars"], default: "Soles" }, // Currency with enum options
+        },
+        cost: { type: Number, min: 0, default: null },
+        currency: { type: String, enum: ["Soles", "Dollars"], default: "Soles" },
 
         // Fields specific to "Alquilo" category
-        areaTotal: { type: String, trim: true, default: "" }, // Total area (optional)
-        habitaciones: { type: Number, min: 0, default: null }, // Number of rooms (optional)
-        planta: { type: Number, min: 0, default: null }, // Floor number (optional)
-        bano: { type: String, enum: ["Yes", "No"], default: "No" }, // Bathroom availability
-        mobiliario: { type: String, maxlength: 255, trim: true, default: "" }, // Furniture description
-        equipamiento: { type: String, maxlength: 255, trim: true, default: "" }, // Equipment description
-        servicios: { type: String, maxlength: 255, trim: true, default: "" }, // Services description
+        areaTotal: { type: String, trim: true, default: "" },
+        habitaciones: { type: Number, min: 0, default: null },
+        planta: { type: Number, min: 0, default: null },
+        bano: { type: String, enum: ["Yes", "No"], default: "No" },
+        mobiliario: { type: String, maxlength: 255, trim: true, default: "" },
+        equipamiento: { type: String, maxlength: 255, trim: true, default: "" },
+        servicios: { type: String, maxlength: 255, trim: true, default: "" },
 
         // Fields specific to "Deporte" category
-        estacionamiento: { type: String, enum: ["Yes", "No"], default: "No" }, // Parking availability
-        deporteType: { type: [String], default: [] }, // Array of sport types (e.g., ["Football", "Basketball"])
+        estacionamiento: { type: String, enum: ["Yes", "No"], default: "No" },
+        deporteType: { type: [String], default: [] },
 
         // Additional category-specific fields
-        alquiloType: { type: String, trim: true, default: "" }, // Type of property for "Alquilo"
-        facilities: { type: String, trim: true, default: "" }, // Facilities description
-        availableHours: { type: String, trim: true, default: "" }, // Available hours
-        googleLink: { type: String, trim: true, default: "" }, // Google Maps link (optional)
-        website: { type: String, trim: true, default: "" }, // Optional website or social media link
+        alquiloType: { type: String, trim: true, default: "" },
+        facilities: { type: String, trim: true, default: "" },
+        availableHours: { type: String, trim: true, default: "" },
+        googleLink: { type: String, trim: true, default: "" },
+        website: { type: String, trim: true, default: "" },
 
         // Review System
         reviews: [
@@ -81,17 +96,19 @@ const adSchema = new mongoose.Schema(
                     default: Date.now
                 }
             }
-        ]
+        ],
+
+        // User Interactions
+        interactions: [interactionSchema]
     },
     {
-        timestamps: true, // Automatically add `createdAt` and `updatedAt` fields
+        timestamps: true,
     }
 );
 
 // Indexes for faster query performance
-adSchema.index({ category: 1 }); // Index for category
-adSchema.index({ createdBy: 1 }); // Index for user-specific queries
-adSchema.index({ createdAt: 1 }); // Index for sorting by creation date
+adSchema.index({ category: 1 });
+adSchema.index({ createdBy: 1 });
+adSchema.index({ createdAt: 1 });
 
-// Export the Ad model
 module.exports = mongoose.model("Ad", adSchema);

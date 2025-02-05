@@ -5,6 +5,7 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const protect = require("../middlewares/authMiddleware");
 const generateUniqueId = require("../utils/uniqueId"); // Import utility function for unique ID generation
+const Ad = require("../models/ad");
 
 // Register a new user
 router.post("/register", async (req, res) => {
@@ -134,22 +135,34 @@ router.post("/login", async (req, res) => {
     }
 });
 
-// Add an ad to favorites
+// Add to Favorites
 router.post("/favorites/:adId", protect, async (req, res) => {
     try {
-        const user = await User.findById(req.user.id);
-        const { adId } = req.params;
+        const adId = req.params.adId;
 
-        if (!user.favorites.includes(adId)) {
-            user.favorites.push(adId);
-            await user.save();
-            res.status(200).json({ message: "Ad added to favorites" });
-        } else {
-            res.status(400).json({ message: "Ad already in favorites" });
+        // Validate ObjectId
+        if (!adId.match(/^[0-9a-fA-F]{24}$/)) {
+            return res.status(400).json({ message: "Invalid Ad ID format" });
         }
+
+        const user = await User.findById(req.user.id);
+        const ad = await Ad.findById(adId);
+
+        if (!ad) {
+            return res.status(404).json({ message: "Ad not found" });
+        }
+
+        if (!user.favorites.includes(ad._id)) {
+            user.favorites.push(ad._id);
+            ad.favoritesCount = (ad.favoritesCount || 0) + 1; 
+            await ad.save();
+        }
+
+        await user.save();
+        res.status(200).json({ message: "Ad added to favorites", favoritesCount: ad.favoritesCount });
     } catch (error) {
         console.error("Error adding to favorites:", error);
-        res.status(500).json({ message: "Failed to add to favorites" });
+        res.status(500).json({ message: "Server error", error: error.message });
     }
 });
 
@@ -157,9 +170,18 @@ router.post("/favorites/:adId", protect, async (req, res) => {
 router.delete("/favorites/:adId", protect, async (req, res) => {
     try {
         const user = await User.findById(req.user.id);
-        const { adId } = req.params;
+        const ad = await Ad.findById(req.params.adId);
 
-        user.favorites = user.favorites.filter(fav => fav.toString() !== adId);
+        if (!ad) {
+            return res.status(404).json({ message: "Ad not found" });
+        }
+
+        if (user.favorites.includes(ad._id)) {
+            user.favorites = user.favorites.filter(fav => fav.toString() !== ad._id.toString());
+            ad.favoritesCount = Math.max(0, ad.favoritesCount - 1); // Decrement favorites count, prevent negatives
+            await ad.save();
+        }
+
         await user.save();
         res.status(200).json({ message: "Ad removed from favorites" });
     } catch (error) {
@@ -186,6 +208,5 @@ router.get("/favorites", protect, async (req, res) => {
         res.status(500).json({ message: "Failed to fetch favorites" });
     }
 });
-
 
 module.exports = router;

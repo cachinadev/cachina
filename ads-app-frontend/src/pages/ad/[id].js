@@ -11,6 +11,7 @@ import API, { addToFavorites, removeFromFavorites, getFavorites } from "../../se
 import { FaPhoneAlt, FaWhatsapp, FaTelegram, FaShareAlt, FaMapMarkerAlt, FaEye, FaHeart, FaRegHeart } from "react-icons/fa";
 import ReviewComponent from "../../components/ReviewComponent"; // Import ReviewComponent
 
+
 // Dynamically import Leaflet components
 const MapContainer = dynamic(() => import("react-leaflet").then((mod) => mod.MapContainer), { ssr: false });
 const TileLayer = dynamic(() => import("react-leaflet").then((mod) => mod.TileLayer), { ssr: false });
@@ -52,11 +53,15 @@ const AdDetails = () => {
                     setError("Failed to load ad details.");
                 }
             };
-            
+
             const checkFavorite = async () => {
                 try {
-                    const favorites = await getFavorites();
-                    setIsFavorite(favorites.some(fav => fav._id === id));
+                    if (user) { // ✅ Only fetch favorites if the user is logged in
+                        const favorites = await getFavorites();
+                        setIsFavorite(favorites.some(fav => fav._id === id));
+                    } else {
+                        setIsFavorite(false); // No favorites for unauthenticated users
+                    }
                 } catch (err) {
                     console.error("Error checking favorites:", err);
                 }
@@ -65,18 +70,24 @@ const AdDetails = () => {
             fetchAdDetails();
             checkFavorite();
         }
-    }, [id]);
+    }, [id, user]); // ✅ Add `user` as a dependency
 
     const toggleFavorite = async () => {
-        try {
-            if (isFavorite) {
-                await removeFromFavorites(id);
-            } else {
-                await addToFavorites(id);
+        // Toggle heart animation immediately
+        setIsFavorite((prev) => !prev);
+
+        if (user) {
+            try {
+                if (!isFavorite) {
+                    await addToFavorites(ad._id);
+                } else {
+                    await removeFromFavorites(ad._id);
+                }
+            } catch (error) {
+                console.error("Error toggling favorite:", error);
             }
-            setIsFavorite(!isFavorite);
-        } catch (error) {
-            console.error("Error toggling favorite:", error);
+        } else {
+            console.warn("You must be logged in to save favorites.");
         }
     };
 
@@ -154,9 +165,9 @@ const AdDetails = () => {
               >
                 <span className="text-sm font-semibold">Marcar Favorito</span>
                 {isFavorite ? (
-                  <FaHeart className="text-red-500 text-xl" />
+                  <FaHeart className="text-red-500 text-2xl" />
                 ) : (
-                  <FaRegHeart className="text-xl" />
+                  <FaRegHeart className="text-2xl" />
                 )}
               </button>
             </div>
@@ -186,6 +197,9 @@ const AdDetails = () => {
                     <div className="bg-white p-6 shadow-lg rounded-lg mb-8">
                         <h2 className="text-2xl font-semibold mb-4">Description</h2>
                         <p className="text-gray-700 leading-relaxed">{ad.description}</p>
+                        <button className={isFavorite ? "favorite active" : "favorite"}>
+                        {isFavorite ? "❤️ Favorited" : "🤍 Add to Favorites"}
+                    </button>
                     </div>
     
                     {/* Location */}
