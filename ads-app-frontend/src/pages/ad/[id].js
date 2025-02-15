@@ -41,36 +41,40 @@ const AdDetails = () => {
     const [error, setError] = useState("");
     const [isFavorite, setIsFavorite] = useState(false);
     const { user } = useAuth(); // Correct Context Usage
-
     useEffect(() => {
-        if (id) {
-            const fetchAdDetails = async () => {
-                try {
-                    const response = await API.get(`/ads/${id}`);
-                    setAd(response.data);
-                } catch (err) {
-                    console.error("Error fetching ad details:", err.response?.data || err.message);
-                    setError("Failed to load ad details.");
+        if (!id) return;
+    
+        const fetchAdDetails = async () => {
+            try {
+                const response = await API.get(`/ads/${id}`);
+                setAd(response.data);
+            } catch (err) {
+                console.error("Error fetching ad details:", err.response?.data || err.message);
+                setError("Failed to load ad details.");
+            }
+        };
+    
+        const checkFavorite = async () => {
+            try {
+                if (user) {  // ✅ Only fetch favorites if a user is logged in
+                    const favorites = await getFavorites();
+                    setIsFavorite(favorites.some(fav => fav._id === id));
+                } else {
+                    setIsFavorite(false); // No favorites for unauthenticated users
                 }
-            };
-
-            const checkFavorite = async () => {
-                try {
-                    if (user) { // ✅ Only fetch favorites if the user is logged in
-                        const favorites = await getFavorites();
-                        setIsFavorite(favorites.some(fav => fav._id === id));
-                    } else {
-                        setIsFavorite(false); // No favorites for unauthenticated users
-                    }
-                } catch (err) {
-                    console.error("Error checking favorites:", err);
-                }
-            };
-
-            fetchAdDetails();
+            } catch (err) {
+                console.error("Error checking favorites:", err);
+            }
+        };
+    
+        fetchAdDetails();
+    
+        // ✅ Only call checkFavorite if a user is logged in to avoid 401 errors
+        if (user) {
             checkFavorite();
         }
-    }, [id, user]); // ✅ Add `user` as a dependency
+    
+    }, [id, user]); // ✅ Depend on `id` & `user`    
 
     const toggleFavorite = async () => {
         // Toggle heart animation immediately

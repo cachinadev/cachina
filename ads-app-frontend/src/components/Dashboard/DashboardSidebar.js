@@ -4,13 +4,13 @@ import { getFavorites, getUserDetails } from "../../services/api";
 
 const DashboardSidebar = ({ user, activeTab, setActiveTab, handleLogout }) => {
   const [favorites, setFavorites] = useState([]);
-  const [adsPostedCount, setAdsPostedCount] = useState(0); // Add state for ads count
+  const [adsPostedCount, setAdsPostedCount] = useState(0);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const userDetails = await getUserDetails();
-        setAdsPostedCount(userDetails.adsPosted.length); // Update ads posted count
+        setAdsPostedCount(userDetails.adsPosted.length);
 
         const favoriteAds = await getFavorites();
         setFavorites(favoriteAds);
@@ -43,48 +43,45 @@ const DashboardSidebar = ({ user, activeTab, setActiveTab, handleLogout }) => {
           </div>
         </div>
 
-        <div className="mb-8">
+        <div className="mb-6">
           <p className="text-sm text-gray-400 mb-1">Plan:</p>
           <p className="text-lg font-medium text-green-400">{user?.planType || "N/A"}</p>
         </div>
 
-        <div className="mb-8">
+        <div className="mb-6">
           <p className="text-sm text-gray-400 mb-1">Ads Posted:</p>
           <p className="text-lg font-medium text-yellow-300">
             {adsPostedCount}
           </p>
         </div>
 
-        {/* Navigation Links */}
-        <nav className="mt-8">
+        {/* 📌 Navigation Links */}
+        <nav className="mt-6">
           <ul>
+            {/* ✅ Create Ad First */}
             <li
               className={`flex items-center gap-3 p-3 rounded-md cursor-pointer ${
-                activeTab === "allAds"
-                  ? "bg-gray-700 text-white"
-                  : "hover:bg-gray-700 hover:text-white"
-              }`}
-              onClick={() => setActiveTab("allAds")}
-            >
-              <FaAd className="text-xl" />
-              <span>All Ads</span>
-            </li>
-            <li
-              className={`flex items-center gap-3 p-3 rounded-md cursor-pointer mt-3 ${
-                activeTab === "createAd"
-                  ? "bg-gray-700 text-white"
-                  : "hover:bg-gray-700 hover:text-white"
+                activeTab === "createAd" ? "bg-gray-700 text-white" : "hover:bg-gray-700 hover:text-white"
               }`}
               onClick={() => setActiveTab("createAd")}
             >
               <FaPlusCircle className="text-xl" />
               <span>Create Ad</span>
             </li>
+
             <li
               className={`flex items-center gap-3 p-3 rounded-md cursor-pointer mt-3 ${
-                activeTab === "favorites"
-                  ? "bg-gray-700 text-white"
-                  : "hover:bg-gray-700 hover:text-white"
+                activeTab === "allAds" ? "bg-gray-700 text-white" : "hover:bg-gray-700 hover:text-white"
+              }`}
+              onClick={() => setActiveTab("allAds")}
+            >
+              <FaAd className="text-xl" />
+              <span>All Ads</span>
+            </li>
+
+            <li
+              className={`flex items-center gap-3 p-3 rounded-md cursor-pointer mt-3 ${
+                activeTab === "favorites" ? "bg-gray-700 text-white" : "hover:bg-gray-700 hover:text-white"
               }`}
               onClick={() => setActiveTab("favorites")}
             >
@@ -94,20 +91,18 @@ const DashboardSidebar = ({ user, activeTab, setActiveTab, handleLogout }) => {
 
             <li
               className={`flex items-center gap-3 p-3 rounded-md cursor-pointer mt-3 ${
-                  activeTab === "analytics"
-                      ? "bg-gray-700 text-white"
-                      : "hover:bg-gray-700 hover:text-white"
+                activeTab === "analytics" ? "bg-gray-700 text-white" : "hover:bg-gray-700 hover:text-white"
               }`}
-              onClick={() => setActiveTab("analytics")} >
+              onClick={() => setActiveTab("analytics")}
+            >
               <FaChartBar className="text-xl" />
               <span>Ad Analytics</span>
             </li>
-            
           </ul>
         </nav>
       </div>
 
-      {/* Logout Button */}
+      {/* 🚪 Logout Button */}
       <div className="p-6">
         <button
           onClick={handleLogout}

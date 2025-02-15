@@ -72,7 +72,7 @@ const AdAnalytics = () => {
             <h2 className="text-3xl font-bold text-center">Panel de análisis de anuncios</h2>
 
             <div className="flex justify-center">
-                <label className="mr-2 font-semibold">Select an Ad:</label>
+                <label className="mr-2 font-semibold">Seleccione un anuncio:</label>
                 <select onChange={handleAdChange} className="border rounded-md p-2">
                     {analytics.map((ad) => (
                         <option key={ad.title} value={ad.title}>
@@ -85,7 +85,7 @@ const AdAnalytics = () => {
             {selectedAd && (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     <div className="p-4 border rounded-lg shadow-sm">
-                        <h3 className="font-semibold text-xl mb-2 text-center">📈 Views Chart</h3>
+                        <h3 className="font-semibold text-xl mb-2 text-center">📈 Gráfico de vistas</h3>
                         <Bar
                             data={{
                                 labels: [selectedAd.title],
@@ -102,7 +102,7 @@ const AdAnalytics = () => {
                     </div>
 
                     <div className="p-4 border rounded-lg shadow-sm">
-                        <h3 className="font-semibold text-xl mb-2 text-center">❤️ Favorites Chart</h3>
+                        <h3 className="font-semibold text-xl mb-2 text-center"> ❤️ Tabla de favoritos</h3>
                         <Pie
                             data={{
                                 labels: ["Favorites", "Not Favorited"],
@@ -118,7 +118,7 @@ const AdAnalytics = () => {
                     </div>
 
                     <div className="p-4 border rounded-lg shadow-sm">
-                        <h3 className="font-semibold text-xl mb-2 text-center">⚡ Engagement Rate</h3>
+                        <h3 className="font-semibold text-xl mb-2 text-center">⚡ Tasa de participación</h3>
                         <Line
                             data={{
                                 labels: [selectedAd.title],
@@ -138,7 +138,7 @@ const AdAnalytics = () => {
             )}
 
             <div className="mt-8">
-                <h3 className="text-xl font-semibold text-center mb-4">📋 Summary Overview</h3>
+                <h3 className="text-xl font-semibold text-center mb-4">📋 Resumen general</h3>
                 <Bar data={summaryData} options={chartOptions} />
             </div>
         </div>

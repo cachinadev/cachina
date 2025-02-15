@@ -183,5 +183,68 @@ export const AdAPI = {
     deleteReview,
 };
 
+// ---------------- COMPLAINT FUNCTIONS ----------------
+export const submitComplaint = async (complaintData) => {
+    try {
+        const filteredData = Object.fromEntries(
+            Object.entries(complaintData).filter(([_, value]) => value !== "")
+        );
+
+        const { data } = await API.post("/complaints/submit", {
+            ...filteredData,
+            acceptedPrivacyPolicy: complaintData.acceptedPrivacyPolicy === true, // Ensure boolean
+            status: "pending", // Default status
+        });
+
+        return data;
+    } catch (error) {
+        console.error("Error submitting complaint:", error.response?.data || error.message);
+        throw error;
+    }
+};
+
+// ---------------- ROUTES (TRANSPORT) FUNCTIONS ----------------
+
+// Fetch all routes (Public Transport Paths)
+export const fetchRoutes = async () => {
+    try {
+        const { data } = await API.get("/rutas"); // ✅ Ensure correct API path
+        return data;
+    } catch (error) {
+        console.error("Error fetching routes:", error.response?.data || error.message);
+        return [];
+    }
+};
+
+// Fetch specific route details by ID
+export const getRouteDetails = async (routeId) => {
+    try {
+        const { data } = await API.get(`/rutas/${routeId}`);
+        return data;
+    } catch (error) {
+        console.error("Error fetching route details:", error.response?.data || error.message);
+        return null;
+    }
+};
+
+// Fetch real-time vehicle locations for a route
+export const getVehicleLocations = async (routeId) => {
+    try {
+        const { data } = await API.get(`/rutas/${routeId}/vehicles`);
+        return data;
+    } catch (error) {
+        console.error("Error fetching vehicle locations:", error.response?.data || error.message);
+        return [];
+    }
+};
+
+// ---------------- EXPORT GROUPS ----------------
+export const RoutesAPI = {
+    fetchRoutes,
+    getRouteDetails,
+    getVehicleLocations,
+};
+
+
 // Default Export
 export default API;

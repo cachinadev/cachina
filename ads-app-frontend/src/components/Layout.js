@@ -1,6 +1,14 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/router";
-import { FaUserCircle, FaSignOutAlt, FaTachometerAlt } from "react-icons/fa";
+import {
+  FaUserCircle,
+  FaSignOutAlt,
+  FaTachometerAlt,
+  FaBriefcase,
+  FaQuestionCircle,
+  FaSortAlphaUp,
+  FaBusAlt,
+} from "react-icons/fa";
 
 const Layout = ({ children }) => {
   const router = useRouter();
@@ -8,18 +16,14 @@ const Layout = ({ children }) => {
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef(null);
 
-  // Function to fetch user details from localStorage
+  // Fetch user details from localStorage
   const fetchUserDetails = () => {
     try {
       const token = localStorage.getItem("token");
       const storedUser = localStorage.getItem("user");
-      if (token && storedUser) {
-        setUser(JSON.parse(storedUser));
-      } else {
-        setUser(null);
-      }
+      setUser(token && storedUser ? JSON.parse(storedUser) : null);
     } catch (error) {
-      console.error("Error fetching user details", error);
+      console.error("Error fetching user details:", error);
       setUser(null);
     }
   };
@@ -29,27 +33,35 @@ const Layout = ({ children }) => {
     fetchUserDetails();
   }, []);
 
-  // Listen for changes in localStorage to detect login/logout from other tabs or pages
+  // Listen for login/logout updates
   useEffect(() => {
-    const handleStorageChange = (event) => {
-      if (event.key === "token" || event.key === "user") {
-        fetchUserDetails();
-      }
-    };
-
+    const handleStorageChange = () => fetchUserDetails();
     window.addEventListener("storage", handleStorageChange);
     return () => window.removeEventListener("storage", handleStorageChange);
   }, []);
 
-  // Function to handle logout
+  // Auto-refresh UI every second
+  useEffect(() => {
+    const interval = setInterval(fetchUserDetails, 1000);
+    return () => clearInterval(interval);
+  }, []);
+
+  // Logout function
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
     setUser(null);
-    router.push("/"); // Redirect to landing page
+    setMenuOpen(false);
+    router.push("/");
   };
 
-  // Close the dropdown when clicking outside
+  // Redirect to Dashboard's Create Ad tab
+  const navigateToDashboard = () => {
+    router.push("/dashboard?tab=createAd");
+    setMenuOpen(false);
+  };
+
+  // Close dropdown menu when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (menuRef.current && !menuRef.current.contains(event.target)) {
@@ -62,16 +74,49 @@ const Layout = ({ children }) => {
 
   return (
     <div className="min-h-screen flex flex-col">
+      {/* 🔵 Header */}
       <header className="bg-blue-600 text-white py-4 shadow-md flex justify-between items-center px-6">
-        <div
-          className="text-2xl font-bold cursor-pointer"
-          onClick={() => router.push("/")}
-        >
+        {/* 🔹 Logo */}
+        <div className="text-2xl font-bold cursor-pointer" onClick={() => router.push("/")}>
           Cachina.pe
         </div>
+
+        {/* 🔹 Navigation Links */}
+        <div className="flex gap-6">
+          <button
+            onClick={() => router.push("/negocios")}
+            className="text-white text-lg font-medium hover:underline flex items-center gap-2"
+          >
+            <FaBriefcase /> Negocios
+          </button>
+
+          <button
+            onClick={() => router.push("/recursos")}
+            className="text-white text-lg font-medium hover:underline flex items-center gap-2"
+          >
+            <FaSortAlphaUp/> Recursos
+          </button>
+
+          <button
+            onClick={() => router.push("/ayuda-contacto")}
+            className="text-white text-lg font-medium hover:underline flex items-center gap-2"
+          >
+            <FaQuestionCircle /> Ayuda y Contacto
+          </button>
+
+          <button
+            onClick={() => router.push("/rutas")}
+            className="text-white text-lg font-medium hover:underline flex items-center gap-2"
+          >
+            <FaBusAlt/> Rutas
+          </button>
+        </div>
+
+        {/* 🔹 User Menu */}
         <div className="relative" ref={menuRef}>
           {user ? (
             <div className="relative">
+              {/* 👤 User Button */}
               <button
                 className="flex items-center gap-2 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700 transition"
                 onClick={() => setMenuOpen((prev) => !prev)}
@@ -79,21 +124,25 @@ const Layout = ({ children }) => {
                 <FaUserCircle className="text-xl" />
                 {user.name}
               </button>
+
+              {/* 🔽 Dropdown Menu */}
               {menuOpen && (
                 <div className="absolute right-0 mt-2 w-48 bg-white text-gray-700 shadow-lg rounded-md overflow-hidden z-50">
                   <div className="px-4 py-2 border-b border-gray-200">
                     <p className="text-sm font-semibold">{user.name}</p>
                     <p className="text-xs text-gray-500">{user.uniqueId}</p>
                   </div>
-                  {router.pathname !== "/dashboard" && (
-                    <button
-                      onClick={() => router.push("/dashboard")}
-                      className="w-full flex items-center gap-2 px-4 py-2 hover:bg-gray-100 transition"
-                    >
-                      <FaTachometerAlt />
-                      Dashboard
-                    </button>
-                  )}
+
+                  {/* 📌 Dashboard (Redirects to Create Ad first) */}
+                  <button
+                    onClick={navigateToDashboard}
+                    className="w-full flex items-center gap-2 px-4 py-2 hover:bg-gray-100 transition"
+                  >
+                    <FaTachometerAlt />
+                    Dashboard
+                  </button>
+
+                  {/* 🚪 Logout */}
                   <button
                     onClick={handleLogout}
                     className="w-full flex items-center gap-2 px-4 py-2 hover:bg-gray-100 transition text-red-500"
@@ -105,6 +154,7 @@ const Layout = ({ children }) => {
               )}
             </div>
           ) : (
+            // Login & Register Buttons
             <div className="flex gap-3">
               <button
                 onClick={() => router.push("/login")}
@@ -123,10 +173,39 @@ const Layout = ({ children }) => {
         </div>
       </header>
 
+      {/* 🔹 Main Content */}
       <main className="flex-1 container mx-auto px-4 py-6">{children}</main>
 
-      <footer className="bg-gray-800 text-white py-4 text-center">
-        © CACHINA PE {new Date().getFullYear()} All rights reserved.
+      {/* 🔹 Footer */}
+      <footer className="bg-gray-900 text-white py-8 text-center">
+        <div className="container mx-auto flex flex-col md:flex-row justify-between px-6">
+          {/* 🌐 Navigation Links */}
+          <div className="flex flex-col space-y-2 md:w-1/3">
+            <a href="/nosotros" className="text-gray-400 hover:text-white">Nosotros</a>
+            <a href="/politica-de-privacidad" className="text-gray-400 hover:text-white">Política de Privacidad</a>
+            <a href="/ayuda-contacto" className="text-gray-400 hover:text-white">Ayuda y Contacto</a>
+          </div>
+
+          <div className="flex flex-col space-y-2 md:w-1/3">
+            <a href="/terminos-condiciones" className="text-gray-400 hover:text-white">Términos y Condiciones</a>
+            <a href="/trabaja-con-nosotros" className="text-gray-400 hover:text-white">Trabaja con Nosotros</a>
+            <a href="/libro-reclamaciones" className="text-gray-400 hover:text-white">
+              Libro de Reclamaciones 📜
+            </a>
+          </div>
+
+          {/* 📞 Contact Details */}
+          <div className="text-gray-400 md:w-1/3">
+            <p>📞 Teléfono: <a href="tel:+51986035075" className="hover:text-white">+51 986 035 075</a></p>
+            <p>📧 Email: <a href="mailto:cachinapuntope@gmail.com" className="hover:text-white">cachinapuntope@gmail.com</a></p>
+            <p className="mt-2">CACHINA PE E.I.R.L. <br /> RUC: 20613204106</p>
+          </div>
+        </div>
+
+        {/* 🔹 Copyright */}
+        <p className="text-gray-500 text-sm mt-6">
+          © {new Date().getFullYear()} CACHINA PE - Todos los derechos reservados.
+        </p>
       </footer>
     </div>
   );

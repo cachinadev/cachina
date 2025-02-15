@@ -95,7 +95,7 @@ const departamentosProvinciasDistritos = {
             Chepén: [
                 "Chepén", "Pacanga", "Pueblo Nuevo"
             ],
-            GranChimú: [
+            "Gran Chimú": [
                 "Cascas", "Lucma", "Marmot", "Sayapullo"
             ],
             Julcán: [
@@ -113,11 +113,11 @@ const departamentosProvinciasDistritos = {
                 "Huayo", "Ongón", "Parcoy", "Pataz", "Pías", 
                 "Santiago de Challas", "Taurija", "Urpay"
             ],
-            SánchezCarrión: [
+            "Sánchez Carrión": [
                 "Huamachuco", "Chugay", "Cochorco", "Curgos", 
                 "Marcabal", "Sanagorán", "Sarin", "Sartimbamba"
             ],
-            SantiagoDeChuco: [
+            "Santiago De Chuco": [
                 "Santiago de Chuco", "Angasmarca", "Cachicadán", "Mollebamba", 
                 "Mollepata", "Quiruvilca", "Santa Cruz de Chuca", "Sitabamba"
             ],

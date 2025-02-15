@@ -50,7 +50,7 @@ const adSchema = new mongoose.Schema(
             trim: true,
         },
         cost: { type: Number, min: 0, default: null },
-        currency: { type: String, enum: ["Soles", "Dollars"], default: "Soles" },
+        currency: { type: String, enum: ["Soles", "Dollars"], default: "Cotizar" },
 
         // Fields specific to "Alquilo" category
         areaTotal: { type: String, trim: true, default: "" },
