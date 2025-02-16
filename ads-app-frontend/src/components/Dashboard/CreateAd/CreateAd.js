@@ -102,7 +102,7 @@ const CreateAd = ({ fetchUserDetails, fetchUserAds }) => {
 
     return (
         <form onSubmit={handleSubmit} className="space-y-6 bg-white p-6 rounded shadow-md">
-            <h1 className="text-2xl font-bold mb-4">Muestra tu negocio & servicio</h1>
+            <h1 className="text-2xl font-bold mb-4">Ofrece tu negocio & servicio</h1>
 
             {error && <p className="text-red-500 mb-4">{error}</p>}
             {success && <p className="text-green-500 mb-4">{success}</p>}
@@ -126,7 +126,7 @@ const CreateAd = ({ fetchUserDetails, fetchUserAds }) => {
                 type="submit"
                 className="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600 transition duration-200"
             >
-                Submit
+                Ofrecer
             </button>
         </form>
     );

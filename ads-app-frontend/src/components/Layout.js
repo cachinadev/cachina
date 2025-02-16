@@ -85,28 +85,28 @@ const Layout = ({ children }) => {
         <div className="flex gap-6">
           <button
             onClick={() => router.push("/negocios")}
-            className="text-white text-lg font-medium hover:underline flex items-center gap-2"
+            className="text-white text-base font-medium hover:underline flex items-center gap-2"
           >
             <FaBriefcase /> Negocios
           </button>
 
           <button
             onClick={() => router.push("/recursos")}
-            className="text-white text-lg font-medium hover:underline flex items-center gap-2"
+            className="text-white text-base font-medium hover:underline flex items-center gap-2"
           >
             <FaSortAlphaUp/> Recursos
           </button>
 
           <button
             onClick={() => router.push("/ayuda-contacto")}
-            className="text-white text-lg font-medium hover:underline flex items-center gap-2"
+            className="text-white text-base font-medium hover:underline flex items-center gap-2"
           >
             <FaQuestionCircle /> Ayuda y Contacto
           </button>
 
           <button
             onClick={() => router.push("/rutas")}
-            className="text-white text-lg font-medium hover:underline flex items-center gap-2"
+            className="text-white text-base font-medium hover:underline flex items-center gap-2"
           >
             <FaBusAlt/> Rutas
           </button>

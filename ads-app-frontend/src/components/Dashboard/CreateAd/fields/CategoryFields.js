@@ -39,7 +39,7 @@ const CategoryFields = ({ category, formData, handleChange, handleCheckboxChange
     }, [category]);
 
     if (!category) {
-        return <p className="text-gray-500">Select a category to load its specific fields.</p>;
+        return <p className="text-gray-500">Seleccione una categoría para cargar sus campos específicos.</p>;
     }
 
     if (loading) {

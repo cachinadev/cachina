@@ -49,7 +49,7 @@ const DashboardSidebar = ({ user, activeTab, setActiveTab, handleLogout }) => {
         </div>
 
         <div className="mb-6">
-          <p className="text-sm text-gray-400 mb-1">Ads Posted:</p>
+          <p className="text-sm text-gray-400 mb-1">Anuncios publicados:</p>
           <p className="text-lg font-medium text-yellow-300">
             {adsPostedCount}
           </p>

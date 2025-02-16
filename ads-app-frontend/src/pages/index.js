@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useRouter } from "next/router";
 import API from "../services/api";
 import { formatDistanceToNow, parseISO } from "date-fns";
@@ -12,95 +12,58 @@ const LandingPage = () => {
     const [departamento, setDepartamento] = useState("");
     const [provincia, setProvincia] = useState("");
     const [distrito, setDistrito] = useState("");
-    const [filteredAds, setFilteredAds] = useState([]);
-    const [uniqueFilters, setUniqueFilters] = useState({
-        categories: [],
-        departamentos: [],
-        provincias: [],
-        distritos: []
-    });
-
     const router = useRouter();
 
     useEffect(() => {
         const fetchAds = async () => {
             try {
                 const response = await API.get("/ads");
-                let adsData = response.data;
-
-                // Sort ads by creation date (latest first)
-                adsData = adsData.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-
-                setAds(adsData);
-                setFilteredAds(adsData);
-
-                const categories = [...new Set(adsData.map((ad) => ad.category))].filter(Boolean);
-                const departamentos = [...new Set(adsData.map((ad) => ad.departamento))].filter(Boolean);
-
-                setUniqueFilters({ categories, departamentos, provincias: [], distritos: [] });
+                const sortedAds = response.data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+                setAds(sortedAds);
             } catch (err) {
-                console.error("Error fetching ads:", err.response?.data || err.message);
                 setError("Failed to load ads. Please try again later.");
+                console.error("Error fetching ads:", err.response?.data || err.message);
             }
         };
         fetchAds();
     }, []);
 
-    useEffect(() => {
-        if (departamento) {
-            const provincias = [
-                ...new Set(ads.filter((ad) => ad.departamento === departamento).map((ad) => ad.provincia))
-            ].filter(Boolean);
-            setUniqueFilters((prev) => ({ ...prev, provincias, distritos: [] }));
-            setProvincia("");
-            setDistrito("");
-        }
-    }, [departamento, ads]);
+    // 🏷️ Memoized Unique Filters (Avoid recalculating on every render)
+    const uniqueFilters = useMemo(() => {
+        const categories = [...new Set(ads.map((ad) => ad.category))].filter(Boolean);
+        const departamentos = [...new Set(ads.map((ad) => ad.departamento))].filter(Boolean);
+        const provincias = departamento
+            ? [...new Set(ads.filter((ad) => ad.departamento === departamento).map((ad) => ad.provincia))].filter(Boolean)
+            : [];
+        const distritos = provincia
+            ? [...new Set(ads.filter((ad) => ad.provincia === provincia).map((ad) => ad.distrito))].filter(Boolean)
+            : [];
+        return { categories, departamentos, provincias, distritos };
+    }, [ads, departamento, provincia]);
 
+    // ⏳ Debounced Search Effect (Prevents excessive re-renders)
+    const [debouncedSearchTerm, setDebouncedSearchTerm] = useState(searchTerm);
     useEffect(() => {
-        if (provincia) {
-            const distritos = [
-                ...new Set(
-                    ads.filter((ad) => ad.departamento === departamento && ad.provincia === provincia).map((ad) => ad.distrito)
-                )
-            ].filter(Boolean);
-            setUniqueFilters((prev) => ({ ...prev, distritos }));
-            setDistrito("");
-        }
-    }, [provincia, departamento, ads]);
+        const timeoutId = setTimeout(() => {
+            setDebouncedSearchTerm(searchTerm);
+        }, 300);
+        return () => clearTimeout(timeoutId);
+    }, [searchTerm]);
 
-    useEffect(() => {
-        let filtered = ads;
-
-        if (searchTerm) {
-            filtered = filtered.filter((ad) =>
-                ad.title.toLowerCase().includes(searchTerm.toLowerCase())
+    // 🏆 Memoized Filtered Ads (Recalculates only when dependencies change)
+    const filteredAds = useMemo(() => {
+        return ads.filter((ad) => {
+            return (
+                (!debouncedSearchTerm ||
+                    ad.title.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ||
+                    (ad.description && ad.description.toLowerCase().includes(debouncedSearchTerm.toLowerCase()))) &&
+                (!category || ad.category === category) &&
+                (!departamento || ad.departamento === departamento) &&
+                (!provincia || ad.provincia === provincia) &&
+                (!distrito || ad.distrito === distrito)
             );
-        }
-
-        if (category) {
-            filtered = filtered.filter((ad) => ad.category === category);
-        }
-
-        if (departamento) {
-            filtered = filtered.filter((ad) => ad.departamento === departamento);
-        }
-
-        if (provincia) {
-            filtered = filtered.filter((ad) => ad.provincia === provincia);
-        }
-
-        if (distrito) {
-            filtered = filtered.filter((ad) => ad.distrito === distrito);
-        }
-
-        setFilteredAds(filtered);
-    }, [searchTerm, category, departamento, provincia, distrito, ads]);
-
-    const timeSinceCreated = (createdAt) => {
-        if (!createdAt) return "Unknown time";
-        return formatDistanceToNow(parseISO(createdAt), { addSuffix: true });
-    };
+        });
+    }, [ads, debouncedSearchTerm, category, departamento, provincia, distrito]);
 
     const handleViewDetails = (adId) => {
         router.push(`/ad/${adId}`);
@@ -126,7 +89,7 @@ const LandingPage = () => {
             {/* Ads List */}
             {error && <p className="text-red-500 text-center">{error}</p>}
             {filteredAds.length === 0 ? (
-                <p className="text-center text-gray-500">No ads found. Adjust your search criteria.</p>
+                <p className="text-center text-gray-500">No se encontraron anuncios. Ajuste sus criterios de búsqueda.</p>
             ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
                     {filteredAds.map((ad, index) => (
@@ -154,22 +117,22 @@ const LandingPage = () => {
                                     </h2>
                                     {index === 0 && (
                                         <span className="bg-green-500 text-white text-xs px-2 py-1 rounded-full">
-                                            New
+                                            Nuevo
                                         </span>
                                     )}
                                 </div>
 
-                                <div className="text-sm text-gray-500 mb-2">
-                                    <strong className="text-gray-700">Location:</strong> {ad.departamento}, {ad.provincia}, {ad.distrito}
+                                <div className="text-sm text-gray-500 mb-1">
+                                    <strong className="text-gray-700">Ubicación:</strong> {ad.departamento}, {ad.provincia}, {ad.distrito}
                                 </div>
-                                <div className="text-sm text-gray-500 mb-2">
-                                    <strong className="text-gray-700">Cost:</strong> {ad.cost} {ad.currency}
+                                <div className="text-sm text-gray-500 mb-1">
+                                    <strong className="text-gray-700">Costo:</strong> {ad.cost} {ad.currency}
                                 </div>
-                                <div className="text-sm text-gray-500 mb-2">
-                                    <strong className="text-gray-700">Published by:</strong> {ad.createdBy?.name || "Unknown"}
+                                <div className="text-sm text-gray-500 mb-1">
+                                    <strong className="text-gray-700">Publicado por:</strong> {ad.createdBy?.name || "Desconocido"}
                                 </div>
                                 <div className="text-sm text-gray-500">
-                                    <strong className="text-gray-700">Created:</strong> {timeSinceCreated(ad.createdAt)}
+                                    <strong className="text-gray-700">Publicado:</strong> {formatDistanceToNow(parseISO(ad.createdAt), { addSuffix: true })}
                                 </div>
                             </div>
                         </div>

@@ -20,7 +20,7 @@ const userSchema = new mongoose.Schema({
     },
     planType: {
         type: String,
-        default: "free",
+        default: "Gratis",
     },
     uniqueId: { 
         type: String, 
