@@ -11,18 +11,16 @@ const CreateAd = ({ fetchUserDetails, fetchUserAds }) => {
         departamento: "",
         provincia: "",
         distrito: "",
-        dirección: "",
+        address: "",  // ✅ Ensure address is included
         contactNumber: "",
         cost: "",
-        currency: "Soles",
-        address: "",
+        currency: "Cotizar", // ✅ Default to "Cotizar" if no cost
         googleLink: "",
         pictures: [],
-        types: [],
-        deporteType: [],
-        facilities: "",
         availableHours: "",
-        website: "", // Optional website or social media link
+        website: "",
+        paymentMethods: "", // ✅ Added to match backend
+        availableDays: "", // ✅ Added to match backend
     });
 
     const [error, setError] = useState("");
@@ -30,7 +28,11 @@ const CreateAd = ({ fetchUserDetails, fetchUserAds }) => {
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setFormData((prev) => ({ ...prev, [name]: value }));
+        setFormData((prev) => ({
+            ...prev,
+            [name]: value,
+            ...(name === "cost" && (!value || value === "0") ? { currency: "Cotizar" } : {}), // ✅ Set "Cotizar" if cost is empty or 0
+        }));
     };
 
     const handleFileChange = (e) => {
@@ -53,26 +55,25 @@ const CreateAd = ({ fetchUserDetails, fetchUserAds }) => {
         setSuccess("");
 
         try {
-            const requiredFields = ["title", "description", "category", "contactNumber"];
+            const requiredFields = ["title", "description", "category", "contactNumber", "departamento", "provincia", "distrito"];
             const missingFields = requiredFields.filter(
                 (field) => !formData[field] || formData[field].trim() === ""
             );
 
             if (missingFields.length > 0) {
-                setError(`Please fill in: ${missingFields.join(", ")}`);
+                setError(`Por favor complete: ${missingFields.join(", ")}`);
                 return;
             }
 
             if (!/^\d{9}$/.test(formData.contactNumber)) {
-                setError("Contact number must be a valid 9-digit number.");
+                setError("El número de contacto debe tener 9 dígitos válidos.");
                 return;
             }
 
             await createAd(formData);
 
-            setSuccess("Ad created successfully!");
+            setSuccess("¡Anuncio creado exitosamente!");
 
-            // Reset form
             setFormData({
                 title: "",
                 description: "",
@@ -80,41 +81,47 @@ const CreateAd = ({ fetchUserDetails, fetchUserAds }) => {
                 departamento: "",
                 provincia: "",
                 distrito: "",
+                address: "",  // ✅ Ensure address is included
                 contactNumber: "",
                 cost: "",
-                currency: "Soles",
-                address: "",
+                currency: "Cotizar", // ✅ Reset to default after submit
                 googleLink: "",
                 pictures: [],
-                deporteType: [],
-                facilities: "",
-                availableHours: "",
+                availableDays: "", // ✅ Reset to empty after submit
                 website: "",
+                paymentMethods: "",
             });
 
             fetchUserDetails();
             fetchUserAds();
         } catch (err) {
-            setError(err.response?.data?.message || "Failed to create ad. Please try again.");
-            console.error("Create Ad Error:", err);
+            setError(err.response?.data?.message || "No se pudo crear el anuncio. Intente nuevamente.");
+            console.error("Error al crear el anuncio:", err);
         }
     };
 
     return (
         <form onSubmit={handleSubmit} className="space-y-6 bg-white p-6 rounded shadow-md">
-            <h1 className="text-2xl font-bold mb-4">Ofrece tu negocio & servicio</h1>
+            <h1 className="text-2xl font-bold mb-4 text-center">📢 Difunde tu anuncio</h1>
 
-            {error && <p className="text-red-500 mb-4">{error}</p>}
-            {success && <p className="text-green-500 mb-4">{success}</p>}
+            {error && <p className="text-red-500 text-center mb-4">{error}</p>}
 
-            {/* Common Fields */}
+            {success && (
+                <div className="text-center">
+                    <p className="text-green-500 font-semibold text-lg mb-4">
+                        ¡Anuncio creado exitosamente!
+                    </p>
+                </div>
+            )}
+
+            {/* Campos Comunes */}
             <CommonFields
                 formData={formData}
                 handleChange={handleChange}
                 handleFileChange={handleFileChange}
             />
 
-            {/* Category-Specific Fields */}
+            {/* Campos Específicos de la Categoría */}
             <CategoryFields
                 category={formData.category}
                 formData={formData}
@@ -126,8 +133,16 @@ const CreateAd = ({ fetchUserDetails, fetchUserAds }) => {
                 type="submit"
                 className="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600 transition duration-200"
             >
-                Ofrecer
+                📢 Publicar Anuncio
             </button>
+
+            {success && (
+                <div className="text-center mt-4">
+                    <p className="text-gray-600 text-sm">
+                        🎉 Tu anuncio ha sido publicado con éxito. ¡Esperamos que recibas muchas visitas y clientes!
+                    </p>
+                </div>
+            )}
         </form>
     );
 };

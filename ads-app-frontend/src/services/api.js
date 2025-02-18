@@ -117,18 +117,32 @@ export const getAdDetails = async (adId) => {
 
 export const createAd = async (adData) => {
     const formData = new FormData();
+
     Object.entries(adData).forEach(([key, value]) => {
         if (key === "pictures" && Array.isArray(value)) {
+            // ✅ Append each image individually
             value.forEach((file) => formData.append("images", file));
-        } else {
+        } else if (Array.isArray(value)) {
+            // ✅ Handle multiple selections (deporteType, categories, etc.), removing empty values
+            value.filter(item => item.trim() !== "").forEach(item => formData.append(key, item));
+        } else if (value !== null && value !== undefined && value !== "") {
+            // ✅ Avoid sending `null` or `undefined` values
             formData.append(key, value);
         }
     });
 
-    const { data } = await API.post('/ads/upload-images', formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-    });
-    return data;
+    // ✅ Ensure all necessary fields are sent properly
+    console.log("Sending FormData:", [...formData.entries()]);
+    console.log(formData.get("address")) ///Added
+    try {
+        const { data } = await API.post('/ads/upload-images', formData, {
+            headers: { "Content-Type": "multipart/form-data" },
+        });
+        return data;
+    } catch (error) {
+        console.error("Error creating ad:", error.response?.data || error.message);
+        throw error;
+    }
 };
 
 export const deleteAd = async (adId) => {
@@ -243,6 +257,17 @@ export const RoutesAPI = {
     fetchRoutes,
     getRouteDetails,
     getVehicleLocations,
+};
+
+export const removeFavorite = async (adId) => {
+    const token = localStorage.getItem("token");
+    await fetch(`/api/favorites/${adId}`, {
+        method: "DELETE",
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+        },
+    });
 };
 
 

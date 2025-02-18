@@ -1,111 +1,20 @@
 import React from "react";
-import RenderLocationFields from "../RenderLocationFields";
 
-const AcuiculturaFields = ({ formData, handleChange, handleCheckboxChange }) => {
+const AcuiculturaFields = () => {
     return (
-        <>
-            {/* Aquaculture Type Selection */}
-            <label className="block text-gray-700 font-semibold mb-2">Select Aquaculture Types:</label>
-            <div className="grid grid-cols-2 gap-2 mb-4">
-                {["Pez de mar", "Pez de río", "Mariscos", "Otros"].map((type) => (
-                    <label key={type} className="flex items-center">
-                        <input
-                            type="checkbox"
-                            name="acuiculturaType"
-                            value={type}
-                            checked={formData.acuiculturaType?.includes(type) || false}
-                            onChange={(e) => handleCheckboxChange(e, "acuiculturaType")}
-                            className="mr-2"
-                        />
-                        {type}
-                    </label>
-                ))}
-            </div>
-
-            {/* Location Fields */}
-            <RenderLocationFields formData={formData} handleChange={handleChange} />
-
-            {/* Contact Number */}
-            <label className="block text-gray-700 font-semibold mb-2">Contact Number:</label>
-            <input
-                type="text"
-                name="contactNumber"
-                value={formData.contactNumber || ""}
-                onChange={handleChange}
-                maxLength="9"
-                pattern="\d{9}" // Matches exactly 9 digits
-                placeholder="Enter 9-digit contact number"
-                className="w-full border p-2 mb-4 rounded"
-                required
-            />
-
-            {/* Secondary Contact Number (optional with checkbox) */}
-            <div className="flex items-center mb-4">
-                <input
-                    type="checkbox"
-                    name="hasSecondaryContact"
-                    checked={formData.hasSecondaryContact || false}
-                    onChange={(e) => handleChange({ target: { name: "hasSecondaryContact", value: e.target.checked } })}
-                    className="mr-2"
-                />
-                <label className="text-gray-700">Add Secondary Contact Number</label>
-            </div>
-
-            {formData.hasSecondaryContact && (
-                <input
-                    type="text"
-                    name="secondaryContact"
-                    value={formData.secondaryContact || ""}
-                    onChange={handleChange}
-                    maxLength="9"
-                    pattern="\d{9}"
-                    placeholder="Enter 9-digit secondary contact number"
-                    className="w-full border p-2 mb-4 rounded"
-                />
-            )}
-
-            {/* Social Media Links */}
-            <label className="block text-gray-700 font-semibold mb-2">Facebook (Optional):</label>
-            <input
-                type="url"
-                name="facebook"
-                value={formData.facebook || ""}
-                onChange={handleChange}
-                placeholder="Paste Facebook page URL"
-                className="w-full border p-2 mb-4 rounded"
-            />
-
-            <label className="block text-gray-700 font-semibold mb-2">Instagram (Optional):</label>
-            <input
-                type="url"
-                name="instagram"
-                value={formData.instagram || ""}
-                onChange={handleChange}
-                placeholder="Paste Instagram profile URL"
-                className="w-full border p-2 mb-4 rounded"
-            />
-
-            <label className="block text-gray-700 font-semibold mb-2">TikTok (Optional):</label>
-            <input
-                type="url"
-                name="tiktok"
-                value={formData.tiktok || ""}
-                onChange={handleChange}
-                placeholder="Paste TikTok profile URL"
-                className="w-full border p-2 mb-4 rounded"
-            />
-
-            {/* Website Link */}
-            <label className="block text-gray-700 font-semibold mb-2">Website (Optional):</label>
-            <input
-                type="url"
-                name="website"
-                value={formData.website || ""}
-                onChange={handleChange}
-                placeholder="Paste website URL"
-                className="w-full border p-2 mb-4 rounded"
-            />
-        </>
+        <div className="bg-green-100 p-4 rounded-md mt-4">
+            <h2 className="text-lg font-semibold text-green-700">📌 Sugerencias para tu anuncio de Acuicultura</h2>
+            <p className="text-gray-700 mt-2">
+                Si ofreces productos o servicios relacionados con la acuicultura, menciona:
+            </p>
+            <ul className="list-disc list-inside text-gray-600 mt-2">
+                <li>Tipos de especies cultivadas (peces, mariscos, etc.)</li>
+                <li>Ubicación y tipo de criadero (estanques, jaulas, etc.)</li>
+                <li>Calidad del agua y métodos de alimentación</li>
+                <li>Disponibilidad de venta y entrega</li>
+                <li>Certificaciones sanitarias y permisos</li>
+            </ul>
+        </div>
     );
 };
 

@@ -141,7 +141,7 @@ const AdDetails = () => {
             setNewReview({ rating: 5, comment: "" }); // Clear form
         } catch (error) {
             console.error("Error submitting review:", error);
-            alert("Failed to submit review.");
+            alert("No se pudo enviar la reseña");
         }
     };
 
@@ -201,14 +201,11 @@ const AdDetails = () => {
                     <div className="bg-white p-6 shadow-lg rounded-lg mb-8">
                         <h2 className="text-2xl font-semibold mb-4">Description</h2>
                         <p className="text-gray-700 leading-relaxed">{ad.description}</p>
-                        <button className={isFavorite ? "favorite active" : "favorite"}>
-                        {isFavorite ? "❤️ Favorited" : "🤍 Add to Favorites"}
-                    </button>
                     </div>
     
                     {/* Location */}
                     <div className="bg-white p-6 shadow-lg rounded-lg mb-8">
-                        <h2 className="text-2xl font-semibold mb-4">Location</h2>
+                        <h2 className="text-2xl font-semibold mb-4">Ubicación</h2>
                         {location && (
                             <a
                                 href={ad.googleLink}
@@ -238,58 +235,86 @@ const AdDetails = () => {
         
                 {/* Sticky Right Column */}
                 <div className="sticky top-8">
-                    <div className="bg-white p-6 shadow-lg rounded-lg">
-                        <p className="text-xl font-bold mb-4">Cost: {formattedCost}</p>
-    
-                        <a
-                            href={`tel:${ad.contactNumber}`}
-                            className="block bg-green-500 text-white text-center py-3 mb-4 rounded-lg hover:bg-green-600 transition duration-300"
-                        >
-                            <FaPhoneAlt className="inline-block mr-2" /> Call Now
-                        </a>
-    
-                        <button
-                            onClick={openWhatsApp}
-                            className="block w-full bg-green-600 text-white text-center py-3 mb-4 rounded-lg hover:bg-green-700 transition duration-300"
-                        >
-                            <FaWhatsapp className="inline-block mr-2" /> WhatsApp
-                        </button>
-    
-                        <button
-                            onClick={openTelegram}
-                            className="block w-full bg-blue-500 text-white text-center py-3 mb-4 rounded-lg hover:bg-blue-600 transition duration-300"
-                        >
-                            <FaTelegram className="inline-block mr-2" /> Telegram
-                        </button>
-    
-                        <button
-                            onClick={shareAd}
-                            className="block w-full bg-yellow-500 text-white text-center py-3 mb-4 rounded-lg hover:bg-yellow-600 transition duration-300"
-                        >
-                            <FaShareAlt className="inline-block mr-2" /> Share
-                        </button>
-    
+                    <div className="bg-white p-6 shadow-lg rounded-lg space-y-6">
+                        
+                        {/* 🏷️ Cost & Availability */}
+                        <div className="bg-gray-100 p-4 rounded-lg">
+                            <p className="text-xl font-bold text-gray-800">💰 Costo: {formattedCost}</p>
+                            
+                            {/* ✅ Display Payment Methods */}
+                            {ad.paymentMethods && (
+                                <p className="text-gray-700 mt-2">
+                                    <strong>💳 Métodos de Pago:</strong> {ad.paymentMethods}
+                                </p>
+                            )}
+
+                            {/* ✅ Display Available Days */}
+                            {ad.availableDays && (
+                                <p className="text-gray-700">
+                                    <strong>📆 Días Disponibles:</strong> {ad.availableDays}
+                                </p>
+                            )}
+
+                            {/* ✅ Display Available Hours */}
+                            {ad.availableHours && (
+                                <p className="text-gray-700">
+                                    <strong>🕒 Horario Disponible:</strong> {ad.availableHours}
+                                </p>
+                            )}
+                        </div>
+
+                        {/* 📞 Contact & Action Buttons */}
+                        <div className="space-y-3">
+                            <a
+                                href={`tel:${ad.contactNumber}`}
+                                className="block bg-green-500 text-white text-center py-3 rounded-lg hover:bg-green-600 transition duration-300 shadow-md flex items-center justify-center gap-2"
+                            >
+                                <FaPhoneAlt /> Llamar Ahora
+                            </a>
+
+                            <button
+                                onClick={openWhatsApp}
+                                className="block w-full bg-green-600 text-white text-center py-3 rounded-lg hover:bg-green-700 transition duration-300 shadow-md flex items-center justify-center gap-2"
+                            >
+                                <FaWhatsapp /> WhatsApp
+                            </button>
+
+                            <button
+                                onClick={openTelegram}
+                                className="block w-full bg-blue-500 text-white text-center py-3 rounded-lg hover:bg-blue-600 transition duration-300 shadow-md flex items-center justify-center gap-2"
+                            >
+                                <FaTelegram /> Telegram
+                            </button>
+
+                            <button
+                                onClick={shareAd}
+                                className="block w-full bg-yellow-500 text-white text-center py-3 rounded-lg hover:bg-yellow-600 transition duration-300 shadow-md flex items-center justify-center gap-2"
+                            >
+                                <FaShareAlt /> Compartir
+                            </button>
+                        </div>
+
+                        {/* 🌐 Website Link */}
                         {ad.website && (
                             <a
                                 href={ad.website}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="block text-blue-600 hover:underline text-center mt-4"
+                                className="block text-blue-600 hover:underline text-center font-semibold"
                             >
-                                Visit Website
+                                🌍 Visitar Página Web
                             </a>
                         )}
 
-                        {/* Reviews Section */}
-                        <div>
+                        {/* ⭐ Reviews Section */}
                             <ReviewComponent adId={ad._id} user={user} />
+                      
 
-                        </div>
-    
                     </div>
                 </div>
+
             </div>
-        </div>
+        </div>  
     );
 }
 export default AdDetails;

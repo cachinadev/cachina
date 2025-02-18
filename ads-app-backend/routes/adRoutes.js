@@ -181,14 +181,16 @@ router.delete("/:id", protect, async (req, res) => {
 
         await Ad.findByIdAndDelete(req.params.id);
 
+        // Update user ads
         const user = await User.findById(req.user.id);
         user.adsPosted = user.adsPosted.filter((adId) => adId.toString() !== req.params.id);
         await user.save();
 
-        res.status(200).json({ message: "Ad deleted successfully" });
+        // ✅ Ensure a valid JSON response is returned
+        return res.status(200).json({ success: true, message: "Ad deleted successfully" });
     } catch (error) {
         console.error("Error deleting ad:", error.message);
-        res.status(500).json({ message: "Failed to delete ad" });
+        return res.status(500).json({ success: false, message: "Failed to delete ad" });
     }
 });
 

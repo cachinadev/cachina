@@ -1,35 +1,24 @@
-// AlquiloFields Component: Handles input fields for "Alquilo" category
 import React from "react";
 
-const AlquiloFields = ({ formData, handleChange }) => {
+const AlquiloFields = () => {
   return (
-    <div>
-      <label className="block text-gray-700 mt-4">Type of Place:</label>
-      <select
-        name="alquiloType"
-        value={formData.alquiloType}
-        onChange={handleChange}
-        className="w-full border p-2"
-        required
-      >
-        <option value="">Select Place</option>
-        <option value="Casa">Casa</option>
-        <option value="Departamento">Departamento</option>
-        <option value="Cuarto">Cuarto</option>
-        <option value="Cabaña">Cabaña</option>
-        <option value="Otros">Otros</option>
-      </select>
-
-      <label className="block text-gray-700 mt-4">Area Total (m²):</label>
-      <input
-        type="number"
-        name="areaTotal"
-        value={formData.areaTotal}
-        onChange={handleChange}
-        className="w-full border p-2"
-      />
-      
-      {/* Add other fields as needed */}
+    <div className="mt-4 p-4 border border-blue-400 rounded bg-blue-50">
+      <h3 className="text-blue-600 font-bold">💡 Sugerencias para tu Anuncio de Alquiler</h3>
+      <p className="text-gray-700 mt-2">
+        Para mejorar tu anuncio, considera incluir en la descripción:
+      </p>
+      <ul className="list-disc list-inside text-gray-600 mt-2">
+        <li>📍 Ubicación exacta o referencias cercanas.</li>
+        <li>🏠 Tipo de lugar: Casa, Departamento, Cuarto, Cabaña, etc.</li>
+        <li>📏 Área total (en m²).</li>
+        <li>🛏️ Número de habitaciones y baños.</li>
+        <li>🚗 Disponibilidad de estacionamiento.</li>
+        <li>🛋️ Estado del mobiliario y servicios incluidos.</li>
+        <li>📆 Condiciones de alquiler y requisitos.</li>
+      </ul>
+      <p className="text-gray-700 mt-4">
+        ¡Una buena descripción ayuda a atraer más interesados! ✨
+      </p>
     </div>
   );
 };

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import API from "../services/api";
 import { FaStar } from "react-icons/fa";
 
@@ -8,106 +8,113 @@ const ReviewComponent = ({ adId, user }) => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
 
-    useEffect(() => {
-        const fetchReviews = async () => {
-            try {
-                const { data } = await API.get(`/ads/${adId}/reviews`);
-                setReviews(data);
-            } catch (err) {
-                setError("Failed to load reviews");
-            }
-        };
-
-        fetchReviews();
+    // ✅ Fetch Reviews Function
+    const fetchReviews = useCallback(async () => {
+        try {
+            const { data } = await API.get(`/ads/${adId}/reviews`);
+            setReviews(data);
+        } catch (err) {
+            setError("❌ No se pudo cargar las reseñas.");
+        }
     }, [adId]);
 
+    // ✅ Load Reviews on Component Mount
+    useEffect(() => {
+        if (adId) fetchReviews();
+    }, [adId, fetchReviews]);
+
+    // ✅ Handle Review Submission
     const handleReviewSubmit = async () => {
-        if (newReview.rating === 0 || newReview.comment.trim() === "") {
-            return alert("Please provide both a rating and comment.");
+        if (!newReview.rating || !newReview.comment.trim()) {
+            return alert("⚠️ Por favor, proporciona una calificación y un comentario.");
         }
 
         try {
             setLoading(true);
             const { data } = await API.post(`/ads/${adId}/reviews`, newReview);
-            setReviews((prevReviews) => [data, ...prevReviews]);
-            setNewReview({ rating: 0, comment: "" });
+            setReviews((prevReviews) => [data, ...prevReviews]); // Add new review at the top
+            setNewReview({ rating: 0, comment: "" }); // Reset input
         } catch (err) {
-            setError("Failed to submit review");
+            setError("❌ No se pudo enviar la reseña.");
         } finally {
             setLoading(false);
         }
     };
 
     return (
-        <div className="bg-white p-6 rounded-lg shadow-md mt-6">
-            <h2 className="text-2xl font-bold mb-4">Reviews</h2>
+        <div className="bg-white p-6 rounded-lg shadow-md mt-4">
+            <h2 className="text-2xl font-bold mb-4">📢 Reseñas</h2>
 
-            {error && <p className="text-red-500">{error}</p>}
+            {/* 🔴 Error Message */}
+            {error && <p className="text-red-500 font-semibold">{error}</p>}
 
+            {/* 📝 Review List */}
             {reviews.length === 0 ? (
-                <p>No reviews yet.</p>
+                <p className="text-gray-500">⚠️ No hay reseñas todavía. ¡Sé el primero en dejar una opinión!</p>
             ) : (
-                <ul>
+                <div className="space-y-4">
                     {reviews.map((review) => (
-                        <div key={review._id} className="border p-4 rounded-md shadow-sm mb-2">
-                            <h3 className="font-bold text-lg">
-                                {review.user?.name || "Anonymous"}
+                        <div key={review._id} className="border p-4 rounded-md shadow-sm bg-gray-50">
+                            <h3 className="font-bold text-lg text-gray-800">
+                                {review.user?.name || "Usuario Anónimo"}
                             </h3>
-                            <p className="text-yellow-500">
-                                {"⭐".repeat(review.rating)}
+                            <p className="text-yellow-500 flex items-center">
+                                {[...Array(5)].map((_, i) => (
+                                    <FaStar
+                                        key={i}
+                                        className={i < review.rating ? "text-yellow-400" : "text-gray-300"}
+                                    />
+                                ))}
                             </p>
-                            <p>{review.comment}</p>
+                            <p className="text-gray-700">{review.comment}</p>
                             <p className="text-gray-400 text-sm">
                                 {new Date(review.createdAt).toLocaleDateString()}
                             </p>
                         </div>
                     ))}
-                </ul>
+                </div>
             )}
 
-            {/* Allow only logged-in users to submit reviews */}
+            {/* ✍ Allow only logged-in users to submit reviews */}
             {user ? (
-                <div className="mt-4">
-                    <h3 className="font-bold text-lg">Add Your Review</h3>
-                    <div className="flex items-center my-2">
+                <div className="mt-6">
+                    <h3 className="font-bold text-lg">📝 Añade tu opinión</h3>
+
+                    {/* ⭐ Interactive Star Rating */}
+                    <div className="flex items-center my-3">
                         {[1, 2, 3, 4, 5].map((star) => (
                             <FaStar
                                 key={star}
-                                className={`cursor-pointer text-2xl ${
-                                    newReview.rating >= star
-                                        ? "text-yellow-400"
-                                        : "text-gray-300"
+                                className={`cursor-pointer text-2xl transition-all duration-200 ${
+                                    newReview.rating >= star ? "text-yellow-400 scale-110" : "text-gray-300"
                                 }`}
-                                onClick={() =>
-                                    setNewReview({ ...newReview, rating: star })
-                                }
+                                onClick={() => setNewReview({ ...newReview, rating: star })}
                             />
                         ))}
                     </div>
 
+                    {/* 📝 Review Input */}
                     <textarea
-                        className="w-full p-2 border rounded-md"
+                        className="w-full p-3 border rounded-md shadow-sm focus:ring-2 focus:ring-blue-400"
                         rows="3"
-                        placeholder="Write your review here..."
+                        placeholder="Escribe tu reseña aquí..."
                         value={newReview.comment}
-                        onChange={(e) =>
-                            setNewReview({
-                                ...newReview,
-                                comment: e.target.value,
-                            })
-                        }
+                        onChange={(e) => setNewReview({ ...newReview, comment: e.target.value })}
                     ></textarea>
 
+                    {/* 🔘 Submit Button */}
                     <button
                         onClick={handleReviewSubmit}
-                        className="mt-2 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition duration-300"
+                        className={`mt-4 w-full bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition duration-300 ${
+                            loading ? "cursor-not-allowed opacity-50" : ""
+                        }`}
                         disabled={loading}
                     >
-                        {loading ? "Submitting..." : "Submit Review"}
+                        {loading ? "⏳ Enviando..." : "📤 Enviar Reseña"}
                     </button>
                 </div>
             ) : (
-                <p className="text-gray-500 mt-4">Log in to submit a review.</p>
+                <p className="text-gray-500 mt-4">🔒 Inicia sesión para dejar una reseña.</p>
             )}
         </div>
     );

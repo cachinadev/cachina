@@ -24,6 +24,11 @@ const DashboardSidebar = ({ user, activeTab, setActiveTab, handleLogout }) => {
     }
   }, [user]);
 
+  // ✅ Ensure the dashboard always starts with "Create Ad" when accessed
+  useEffect(() => {
+    setActiveTab("createAd");
+  }, []);
+
   if (!user) {
     return (
       <aside className="w-1/4 bg-gray-800 text-white h-screen flex justify-center items-center">
@@ -58,7 +63,7 @@ const DashboardSidebar = ({ user, activeTab, setActiveTab, handleLogout }) => {
         {/* 📌 Navigation Links */}
         <nav className="mt-6">
           <ul>
-            {/* ✅ Create Ad First */}
+            {/* ✅ Create Ad First (Default Active) */}
             <li
               className={`flex items-center gap-3 p-3 rounded-md cursor-pointer ${
                 activeTab === "createAd" ? "bg-gray-700 text-white" : "hover:bg-gray-700 hover:text-white"
@@ -66,9 +71,10 @@ const DashboardSidebar = ({ user, activeTab, setActiveTab, handleLogout }) => {
               onClick={() => setActiveTab("createAd")}
             >
               <FaPlusCircle className="text-xl" />
-              <span>Create Ad</span>
+              <span>Crea Anuncio</span>
             </li>
 
+            {/* ✅ AllAds Section */}
             <li
               className={`flex items-center gap-3 p-3 rounded-md cursor-pointer mt-3 ${
                 activeTab === "allAds" ? "bg-gray-700 text-white" : "hover:bg-gray-700 hover:text-white"
@@ -76,7 +82,7 @@ const DashboardSidebar = ({ user, activeTab, setActiveTab, handleLogout }) => {
               onClick={() => setActiveTab("allAds")}
             >
               <FaAd className="text-xl" />
-              <span>All Ads</span>
+              <span>Todos los anuncios</span>
             </li>
 
             <li
@@ -86,7 +92,7 @@ const DashboardSidebar = ({ user, activeTab, setActiveTab, handleLogout }) => {
               onClick={() => setActiveTab("favorites")}
             >
               <FaHeart className="text-xl text-red-500" />
-              <span>Favorites ({favorites.length})</span>
+              <span>Favoritos ({favorites.length})</span>
             </li>
 
             <li
@@ -109,7 +115,7 @@ const DashboardSidebar = ({ user, activeTab, setActiveTab, handleLogout }) => {
           className="flex items-center gap-3 bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 w-full justify-center"
         >
           <FaSignOutAlt className="text-xl" />
-          <span>Logout</span>
+          <span>Salir</span>
         </button>
       </div>
     </aside>

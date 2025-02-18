@@ -17,11 +17,11 @@ const interactionSchema = new mongoose.Schema({
 
 const adSchema = new mongoose.Schema(
     {
-        // Common fields
+        // 🏷️ Common Fields
         title: { type: String, required: true, trim: true },
         description: { type: String, required: true, trim: true },
         category: { type: String, required: true, trim: true },
-        pictures: { type: [String], default: [] },
+        pictures: { type: [String], default: [] }, // 📸 Array of image URLs
         views: { type: Number, default: 0 },
         favoritesCount: { type: Number, default: 0 },
         createdBy: {
@@ -31,48 +31,42 @@ const adSchema = new mongoose.Schema(
         },
         isPremium: { type: Boolean, default: false },
 
-        // Location fields
-        departamento: { type: String, trim: true },
-        provincia: { type: String, trim: true },
-        distrito: { type: String, trim: true },
-        dirección: { type: String, maxlength: 255, trim: true, default: "" },
+        // 📍 Location Fields
+        departamento: { type: String, trim: true, required: true },
+        provincia: { type: String, trim: true, required: true },
+        distrito: { type: String, trim: true, required: true },
+        address: { type: String, maxlength: 250, trim: true, default: ""}, // ✅ Ensure address is stored
 
         location: {
             lat: { type: Number },
             lng: { type: Number },
         },
 
-        // Contact and cost
+        // 📞 Contact & Cost
         contactNumber: {
             type: String,
             required: true,
             match: /^\d{9}$/,
             trim: true,
         },
+
         cost: { type: Number, min: 0, default: null },
-        currency: { type: String, enum: ["Soles", "Dollars"], default: "Cotizar" },
+        currency: { 
+            type: String, 
+            enum: ["Soles", "Dollars", "Cotizar"], 
+            default: "Cotizar" // ✅ Set initial default
+        },
+        paymentMethods: { type: String, trim: true, default: "" }, // ✅ Now optional
 
-        // Fields specific to "Alquilo" category
-        areaTotal: { type: String, trim: true, default: "" },
-        habitaciones: { type: Number, min: 0, default: null },
-        planta: { type: Number, min: 0, default: null },
-        bano: { type: String, enum: ["Yes", "No"], default: "No" },
-        mobiliario: { type: String, maxlength: 255, trim: true, default: "" },
-        equipamiento: { type: String, maxlength: 255, trim: true, default: "" },
-        servicios: { type: String, maxlength: 255, trim: true, default: "" },
+        // 📅 Availability
+        availableDays: { type: String, trim: true, default: "" }, 
+        availableHours: { type: String, trim: true, default: "" }, 
 
-        // Fields specific to "Deporte" category
-        estacionamiento: { type: String, enum: ["Yes", "No"], default: "No" },
-        deporteType: { type: [String], default: [] },
-
-        // Additional category-specific fields
-        alquiloType: { type: String, trim: true, default: "" },
-        facilities: { type: String, trim: true, default: "" },
-        availableHours: { type: String, trim: true, default: "" },
+        // 🔗 External Links
         googleLink: { type: String, trim: true, default: "" },
         website: { type: String, trim: true, default: "" },
 
-        // Review System
+        // ⭐ Review System
         reviews: [
             {
                 user: {
@@ -98,7 +92,7 @@ const adSchema = new mongoose.Schema(
             }
         ],
 
-        // User Interactions
+        // 📊 User Interactions
         interactions: [interactionSchema]
     },
     {
@@ -106,7 +100,15 @@ const adSchema = new mongoose.Schema(
     }
 );
 
-// Indexes for faster query performance
+// ✅ Middleware to ensure currency is set to "Cotizar" when cost is null or 0
+adSchema.pre("save", function (next) {
+    if (this.cost === null || this.cost === 0) {
+        this.currency = "Cotizar";
+    }
+    next();
+});
+
+// ⚡ Indexes for faster query performance
 adSchema.index({ category: 1 });
 adSchema.index({ createdBy: 1 });
 adSchema.index({ createdAt: 1 });

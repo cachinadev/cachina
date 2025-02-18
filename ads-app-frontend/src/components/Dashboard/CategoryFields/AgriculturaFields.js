@@ -1,112 +1,25 @@
 import React from "react";
-import RenderLocationFields from "../RenderLocationFields";
 
-const AgriculturaFields = ({ formData, handleChange, handleCheckboxChange }) => {
-    return (
-        <>
-            {/* Agriculture Type Selection */}
-            <label className="block text-gray-700 font-semibold mb-2">Select Agricultura Types:</label>
-            <div className="grid grid-cols-2 gap-2 mb-4">
-                {["Frutas", "Verduras", "Tubérculos", "Granos Andinos", "Otros"].map((type) => (
-                    <label key={type} className="flex items-center">
-                        <input
-                            type="checkbox"
-                            name="agriculturaType"
-                            value={type}
-                            checked={formData.agriculturaType?.includes(type) || false}
-                            onChange={(e) => handleCheckboxChange(e, "agriculturaType")}
-                            className="mr-2"
-                        />
-                        {type}
-                    </label>
-                ))}
-            </div>
-
-            {/* Location Fields */}
-            <RenderLocationFields formData={formData} handleChange={handleChange} />
-
-            {/* Contact Number */}
-            <label className="block text-gray-700 font-semibold mb-2">Contact Number:</label>
-            <input
-                type="text"
-                name="contactNumber"
-                value={formData.contactNumber || ""}
-                onChange={handleChange}
-                maxLength="9"
-                pattern="\d{9}" // Matches exactly 9 digits
-                placeholder="Enter 9-digit contact number"
-                className="w-full border p-2 mb-4 rounded"
-                required
-            />
-
-            {/* Secondary Contact Number (optional with checkbox) */}
-            <div className="flex items-center mb-4">
-                <input
-                    type="checkbox"
-                    name="hasSecondaryContact"
-                    checked={formData.hasSecondaryContact || false}
-                    onChange={(e) => handleChange({ target: { name: "hasSecondaryContact", value: e.target.checked } })}
-                    className="mr-2"
-                />
-                <label className="text-gray-700">Add Secondary Contact Number</label>
-            </div>
-
-            {formData.hasSecondaryContact && (
-                <input
-                    type="text"
-                    name="secondaryContact"
-                    value={formData.secondaryContact || ""}
-                    onChange={handleChange}
-                    maxLength="9"
-                    pattern="\d{9}"
-                    placeholder="Enter 9-digit secondary contact number"
-                    className="w-full border p-2 mb-4 rounded"
-                />
-            )}
-
-            {/* Social Media Links */}
-            <label className="block text-gray-700 font-semibold mb-2">Facebook (Optional):</label>
-            <input
-                type="url"
-                name="facebook"
-                value={formData.facebook || ""}
-                onChange={handleChange}
-                placeholder="Paste Facebook page URL"
-                className="w-full border p-2 mb-4 rounded"
-            />
-
-            <label className="block text-gray-700 font-semibold mb-2">Instagram (Optional):</label>
-            <input
-                type="url"
-                name="instagram"
-                value={formData.instagram || ""}
-                onChange={handleChange}
-                placeholder="Paste Instagram profile URL"
-                className="w-full border p-2 mb-4 rounded"
-            />
-
-            <label className="block text-gray-700 font-semibold mb-2">TikTok (Optional):</label>
-            <input
-                type="url"
-                name="tiktok"
-                value={formData.tiktok || ""}
-                onChange={handleChange}
-                placeholder="Paste TikTok profile URL"
-                className="w-full border p-2 mb-4 rounded"
-            />
-
-            {/* Website Link */}
-            <label className="block text-gray-700 font-semibold mb-2">Website (Optional):</label>
-            <input
-                type="url"
-                name="website"
-                value={formData.website || ""}
-                onChange={handleChange}
-                placeholder="Paste website URL"
-                className="w-full border p-2 mb-4 rounded"
-            />
-        </>
-    );
+const AgriculturaFields = () => {
+  return (
+    <div className="mt-4 p-4 border border-green-400 rounded bg-green-50">
+      <h3 className="text-green-600 font-bold">🌾 Sugerencias para tu Anuncio de Agricultura</h3>
+      <p className="text-gray-700 mt-2">
+        Para mejorar tu anuncio, considera incluir en la descripción:
+      </p>
+      <ul className="list-disc list-inside text-gray-600 mt-2">
+        <li>📍 Ubicación del terreno o finca.</li>
+        <li>🌱 Tipo de cultivo: Frutas, Verduras, Tubérculos, Granos Andinos, etc.</li>
+        <li>💧 Información sobre riego y calidad del suelo.</li>
+        <li>🚜 Equipos o herramientas incluidas.</li>
+        <li>📆 Época de cosecha y disponibilidad.</li>
+        <li>📦 Opciones de venta: Al por mayor, por kilo, por unidad.</li>
+      </ul>
+      <p className="text-gray-700 mt-4">
+        ¡Una buena descripción atraerá más compradores! 🍀
+      </p>
+    </div>
+  );
 };
 
 export default AgriculturaFields;

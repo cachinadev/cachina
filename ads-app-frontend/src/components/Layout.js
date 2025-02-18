@@ -1,13 +1,13 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, useCallback } from "react";
 import { useRouter } from "next/router";
 import {
   FaUserCircle,
   FaSignOutAlt,
-  FaTachometerAlt,
   FaBriefcase,
   FaQuestionCircle,
   FaSortAlphaUp,
   FaBusAlt,
+  FaBullhorn,
 } from "react-icons/fa";
 
 const Layout = ({ children }) => {
@@ -16,8 +16,8 @@ const Layout = ({ children }) => {
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef(null);
 
-  // Fetch user details from localStorage
-  const fetchUserDetails = () => {
+  // Fetch user details from localStorage only when needed
+  const fetchUserDetails = useCallback(() => {
     try {
       const token = localStorage.getItem("token");
       const storedUser = localStorage.getItem("user");
@@ -26,25 +26,19 @@ const Layout = ({ children }) => {
       console.error("Error fetching user details:", error);
       setUser(null);
     }
-  };
+  }, []);
 
   // Fetch user details on initial load
   useEffect(() => {
     fetchUserDetails();
-  }, []);
+  }, [fetchUserDetails]);
 
-  // Listen for login/logout updates
+  // Listen for login/logout updates across tabs
   useEffect(() => {
     const handleStorageChange = () => fetchUserDetails();
     window.addEventListener("storage", handleStorageChange);
     return () => window.removeEventListener("storage", handleStorageChange);
-  }, []);
-
-  // Auto-refresh UI every second
-  useEffect(() => {
-    const interval = setInterval(fetchUserDetails, 1000);
-    return () => clearInterval(interval);
-  }, []);
+  }, [fetchUserDetails]);
 
   // Logout function
   const handleLogout = () => {
@@ -57,7 +51,7 @@ const Layout = ({ children }) => {
 
   // Redirect to Dashboard's Create Ad tab
   const navigateToDashboard = () => {
-    router.push("/dashboard?tab=createAd");
+    router.push("/dashboard");
     setMenuOpen(false);
   };
 
@@ -82,35 +76,20 @@ const Layout = ({ children }) => {
         </div>
 
         {/* 🔹 Navigation Links */}
-        <div className="flex gap-6">
-          <button
-            onClick={() => router.push("/negocios")}
-            className="text-white text-base font-medium hover:underline flex items-center gap-2"
-          >
+        <nav className="flex gap-6">
+          <button onClick={() => router.push("/negocios")} className="text-white text-base font-medium hover:underline flex items-center gap-2">
             <FaBriefcase /> Negocios
           </button>
-
-          <button
-            onClick={() => router.push("/recursos")}
-            className="text-white text-base font-medium hover:underline flex items-center gap-2"
-          >
-            <FaSortAlphaUp/> Recursos
+          <button onClick={() => router.push("/recursos")} className="text-white text-base font-medium hover:underline flex items-center gap-2">
+            <FaSortAlphaUp /> Recursos
           </button>
-
-          <button
-            onClick={() => router.push("/ayuda-contacto")}
-            className="text-white text-base font-medium hover:underline flex items-center gap-2"
-          >
+          <button onClick={() => router.push("/ayuda-contacto")} className="text-white text-base font-medium hover:underline flex items-center gap-2">
             <FaQuestionCircle /> Ayuda y Contacto
           </button>
-
-          <button
-            onClick={() => router.push("/rutas")}
-            className="text-white text-base font-medium hover:underline flex items-center gap-2"
-          >
-            <FaBusAlt/> Rutas
+          <button onClick={() => router.push("/rutas")} className="text-white text-base font-medium hover:underline flex items-center gap-2">
+            <FaBusAlt /> Rutas
           </button>
-        </div>
+        </nav>
 
         {/* 🔹 User Menu */}
         <div className="relative" ref={menuRef}>
@@ -123,7 +102,7 @@ const Layout = ({ children }) => {
               >
                 <FaUserCircle className="text-xl" />
                 {user.name}
-              </button>
+              </button> 
 
               {/* 🔽 Dropdown Menu */}
               {menuOpen && (
@@ -134,21 +113,13 @@ const Layout = ({ children }) => {
                   </div>
 
                   {/* 📌 Dashboard (Redirects to Create Ad first) */}
-                  <button
-                    onClick={navigateToDashboard}
-                    className="w-full flex items-center gap-2 px-4 py-2 hover:bg-gray-100 transition"
-                  >
-                    <FaTachometerAlt />
-                    Dashboard
+                  <button onClick={navigateToDashboard} className="w-full flex items-center gap-2 px-4 py-2 hover:bg-gray-100 transition">
+                    <FaBullhorn /> Anunciar
                   </button>
 
                   {/* 🚪 Logout */}
-                  <button
-                    onClick={handleLogout}
-                    className="w-full flex items-center gap-2 px-4 py-2 hover:bg-gray-100 transition text-red-500"
-                  >
-                    <FaSignOutAlt />
-                    Logout
+                  <button onClick={handleLogout} className="w-full flex items-center gap-2 px-4 py-2 hover:bg-gray-100 transition text-red-500">
+                    <FaSignOutAlt /> Salir
                   </button>
                 </div>
               )}
@@ -156,17 +127,11 @@ const Layout = ({ children }) => {
           ) : (
             // Login & Register Buttons
             <div className="flex gap-3">
-              <button
-                onClick={() => router.push("/login")}
-                className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700 transition"
-              >
-                Login
+              <button onClick={() => router.push("/login")} className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700 transition">
+                Anunciar
               </button>
-              <button
-                onClick={() => router.push("/register")}
-                className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-700 transition"
-              >
-                Register
+              <button onClick={() => router.push("/register")} className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-700 transition">
+                Registrarse
               </button>
             </div>
           )}
@@ -189,9 +154,7 @@ const Layout = ({ children }) => {
           <div className="flex flex-col space-y-2 md:w-1/3">
             <a href="/terminos-condiciones" className="text-gray-400 hover:text-white">Términos y Condiciones</a>
             <a href="/trabaja-con-nosotros" className="text-gray-400 hover:text-white">Trabaja con Nosotros</a>
-            <a href="/libro-reclamaciones" className="text-gray-400 hover:text-white">
-              Libro de Reclamaciones 📜
-            </a>
+            <a href="/libro-reclamaciones" className="text-gray-400 hover:text-white">Libro de Reclamaciones 📜</a>
           </div>
 
           {/* 📞 Contact Details */}

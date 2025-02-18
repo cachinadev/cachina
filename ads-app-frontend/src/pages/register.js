@@ -5,7 +5,7 @@ import axios from "axios";
 const Registration = () => {
   const router = useRouter();
   const [formData, setFormData] = useState({
-    type: "personal", // Default to personal
+    type: "personal", // Predeterminado a personal
     name: "",
     companyName: "",
     taxId: "",
@@ -13,11 +13,11 @@ const Registration = () => {
     password: "",
     confirmPassword: "",
   });
-  const [showPassword, setShowPassword] = useState(false); // Toggle password visibility
+  const [showPassword, setShowPassword] = useState(false); // Alternar visibilidad de contraseña
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
-  const [uniqueId, setUniqueId] = useState(null); // Store unique ID
-  const [loading, setLoading] = useState(false); // Loading state for button
+  const [uniqueId, setUniqueId] = useState(null); // Guardar ID único
+  const [loading, setLoading] = useState(false); // Estado de carga para el botón
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -28,9 +28,9 @@ const Registration = () => {
     setFormData({
       ...formData,
       type: formData.type === "personal" ? "company" : "personal",
-      name: "", // Reset name field
-      companyName: "", // Reset company name field
-      taxId: "", // Reset tax ID field
+      name: "",
+      companyName: "",
+      taxId: "",
     });
   };
 
@@ -40,15 +40,15 @@ const Registration = () => {
     setError("");
     setSuccess("");
 
-    // Form Validation
+    // Validación del formulario
     if (formData.password !== formData.confirmPassword) {
-      setError("Passwords do not match");
+      setError("Las contraseñas no coinciden.");
       setLoading(false);
       return;
     }
 
     if (formData.type === "personal" && (!formData.name || !formData.phone || !formData.password)) {
-      setError("All fields are required for personal registration");
+      setError("Todos los campos son obligatorios para el registro personal.");
       setLoading(false);
       return;
     }
@@ -57,13 +57,13 @@ const Registration = () => {
       formData.type === "company" &&
       (!formData.companyName || !formData.taxId || !formData.phone || !formData.password)
     ) {
-      setError("All fields are required for company registration");
+      setError("Todos los campos son obligatorios para el registro de empresas.");
       setLoading(false);
       return;
     }
 
     if (formData.phone.length !== 9 || isNaN(formData.phone)) {
-      setError("Phone number must be 9 digits");
+      setError("El número de teléfono debe tener 9 dígitos.");
       setLoading(false);
       return;
     }
@@ -73,7 +73,7 @@ const Registration = () => {
         type: formData.type,
         name: formData.type === "personal" ? formData.name : formData.companyName,
         taxId: formData.type === "company" ? formData.taxId : undefined,
-        phoneNumber: formData.phone, // Backend expects phoneNumber
+        phoneNumber: formData.phone, // El backend espera phoneNumber
         password: formData.password,
       };
 
@@ -84,44 +84,46 @@ const Registration = () => {
 
       const { token, user, message } = response.data;
 
-      // Save the token and user details to localStorage
+      // Guardar token y detalles del usuario en localStorage
       localStorage.setItem("token", token);
       localStorage.setItem("user", JSON.stringify(user));
 
-      // Update success message and uniqueId
-      setSuccess(message || "Registration successful!");
+      // Actualizar mensaje de éxito e ID único
+      setSuccess(message || "¡Registro exitoso!");
       setUniqueId(user.uniqueId);
 
-      // Redirect to dashboard after 2 seconds
+      // Redirigir al dashboard después de 2 segundos
       setTimeout(() => {
         router.push("/dashboard");
       }, 1000);
     } catch (err) {
-      setError(err.response?.data?.message || "Registration failed");
-      console.error("Registration error:", err.response?.data || err.message);
+      setError(err.response?.data?.message || "Error al registrarse.");
+      console.error("Error de registro:", err.response?.data || err.message);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="max-w-md mx-auto mt-10">
-      <h1 className="text-2xl font-bold mb-4">Register</h1>
-      {error && <p className="text-red-500 mb-4">{error}</p>}
+    <div className="max-w-md mx-auto mt-10 p-6 border rounded-lg shadow-lg bg-white">
+      <h1 className="text-2xl font-bold mb-4 text-center">Registro</h1>
+      
+      {error && <p className="text-red-500 text-center mb-4">{error}</p>}
       {success && (
-        <div className="text-green-500 mb-4">
+        <div className="text-green-500 text-center mb-4">
           <p>{success}</p>
           {uniqueId && (
             <p>
-              Your Unique ID: <strong>{uniqueId}</strong>
+              Tu ID único: <strong>{uniqueId}</strong>
             </p>
           )}
         </div>
       )}
+
       <form onSubmit={handleSubmit} className="space-y-4">
-        {/* Toggle Between Personal and Company */}
+        {/* Alternar entre Persona y Empresa */}
         <div className="flex items-center justify-between mb-4">
-          <label className="text-gray-700">Register as a company?</label>
+          <label className="text-gray-700">¿Registrar como empresa?</label>
           <label className="relative inline-flex items-center cursor-pointer">
             <input
               type="checkbox"
@@ -133,10 +135,10 @@ const Registration = () => {
           </label>
         </div>
 
-        {/* Name or Company Name */}
+        {/* Nombre o Nombre de Empresa */}
         <div>
           <label className="block text-gray-700">
-            {formData.type === "personal" ? "Name" : "Company Name"}
+            {formData.type === "personal" ? "Nombre" : "Nombre de la Empresa"}
           </label>
           <input
             type="text"
@@ -147,10 +149,10 @@ const Registration = () => {
           />
         </div>
 
-        {/* Tax ID (RUC) for Companies */}
+        {/* RUC para Empresas */}
         {formData.type === "company" && (
           <div>
-            <label className="block text-gray-700">Tax ID (RUC)</label>
+            <label className="block text-gray-700">RUC</label>
             <input
               type="text"
               name="taxId"
@@ -161,9 +163,9 @@ const Registration = () => {
           </div>
         )}
 
-        {/* Phone Number */}
+        {/* Número de Teléfono */}
         <div>
-          <label className="block text-gray-700">Phone</label>
+          <label className="block text-gray-700">Teléfono</label>
           <input
             type="text"
             name="phone"
@@ -174,9 +176,9 @@ const Registration = () => {
           />
         </div>
 
-        {/* Password */}
+        {/* Contraseña */}
         <div>
-          <label className="block text-gray-700">Password</label>
+          <label className="block text-gray-700">Contraseña</label>
           <div className="relative">
             <input
               type={showPassword ? "text" : "password"}
@@ -190,14 +192,14 @@ const Registration = () => {
               onClick={() => setShowPassword(!showPassword)}
               className="absolute right-2 top-2 text-gray-500"
             >
-              {showPassword ? "Hide" : "Show"}
+              {showPassword ? "Ocultar" : "Mostrar"}
             </button>
           </div>
         </div>
 
-        {/* Confirm Password */}
+        {/* Confirmar Contraseña */}
         <div>
-          <label className="block text-gray-700">Confirm Password</label>
+          <label className="block text-gray-700">Confirmar Contraseña</label>
           <input
             type={showPassword ? "text" : "password"}
             name="confirmPassword"
@@ -212,7 +214,7 @@ const Registration = () => {
           className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 w-full"
           disabled={loading}
         >
-          {loading ? "Registering..." : "Register"}
+          {loading ? "Registrando..." : "Registrarse"}
         </button>
       </form>
     </div>

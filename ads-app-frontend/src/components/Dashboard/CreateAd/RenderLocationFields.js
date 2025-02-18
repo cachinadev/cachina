@@ -928,118 +928,129 @@ const departamentosProvinciasDistritos = {
     }
        
 };
-
-
 const RenderLocationFields = ({ formData, handleChange }) => {
     return (
         <>
-            <label htmlFor="departamento" className="block text-gray-700">
-                Departamento:
-            </label>
-            <select
-                name="departamento"
-                value={formData.departamento || ""}
-                onChange={(e) => {
-                    handleChange({
-                        target: {
-                            name: "departamento",
-                            value: e.target.value,
-                        },
-                    });
-                    handleChange({ target: { name: "provincia", value: "" } });
-                    handleChange({ target: { name: "distrito", value: "" } });
-                }}
-                className="w-full border p-2 mb-4 rounded"
-                required
-            >
-                <option value="">Select Departamento</option>
-                {Object.keys(departamentosProvinciasDistritos).map((dep) => (
-                    <option key={dep} value={dep}>
-                        {dep}
-                    </option>
-                ))}
-            </select>
-
-            <label htmlFor="provincia" className="block text-gray-700">
-                Provincia:
-            </label>
-            <select
-                name="provincia"
-                value={formData.provincia || ""}
-                onChange={(e) => {
-                    handleChange({
-                        target: {
-                            name: "provincia",
-                            value: e.target.value,
-                        },
-                    });
-                    handleChange({ target: { name: "distrito", value: "" } });
-                }}
-                className="w-full border p-2 mb-4 rounded"
-                disabled={!formData.departamento}
-                required
-            >
-                <option value="">Select Provincia</option>
-                {formData.departamento &&
-                    Object.keys(departamentosProvinciasDistritos[formData.departamento] || {}).map(
-                        (prov) => (
-                            <option key={prov} value={prov}>
-                                {prov}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                    <label htmlFor="departamento" className="block text-gray-700">
+                        Departamento:
+                    </label>
+                    <select
+                        name="departamento"
+                        value={formData.departamento || ""}
+                        onChange={(e) => {
+                            handleChange({
+                                target: {
+                                    name: "departamento",
+                                    value: e.target.value,
+                                },
+                            });
+                            handleChange({ target: { name: "provincia", value: "" } });
+                            handleChange({ target: { name: "distrito", value: "" } });
+                        }}
+                        className="w-full border p-2 rounded"
+                        required
+                    >
+                        <option value="">Seleccionar Departamento</option>
+                        {Object.keys(departamentosProvinciasDistritos).map((dep) => (
+                            <option key={dep} value={dep}>
+                                {dep}
                             </option>
-                        )
-                    )}
-            </select>
+                        ))}
+                    </select>
+                </div>
+                <div>
+                    <label htmlFor="provincia" className="block text-gray-700">
+                        Provincia:
+                    </label>
+                    <select
+                        name="provincia"
+                        value={formData.provincia || ""}
+                        onChange={(e) => {
+                            handleChange({
+                                target: {
+                                    name: "provincia",
+                                    value: e.target.value,
+                                },
+                            });
+                            handleChange({ target: { name: "distrito", value: "" } });
+                        }}
+                        className="w-full border p-2 rounded"
+                        disabled={!formData.departamento}
+                        required
+                    >
+                        <option value="">Seleccionar Provincia</option>
+                        {formData.departamento &&
+                            Object.keys(departamentosProvinciasDistritos[formData.departamento] || {}).map(
+                                (prov) => (
+                                    <option key={prov} value={prov}>
+                                        {prov}
+                                    </option>
+                                )
+                            )}
+                    </select>
+                </div>
+                <div>
+                    <label htmlFor="distrito" className="block text-gray-700">
+                        Distrito:
+                    </label>
+                    <select
+                        name="distrito"
+                        value={formData.distrito || ""}
+                        onChange={handleChange}
+                        className="w-full border p-2 rounded"
+                        disabled={!formData.provincia}
+                        required
+                    >
+                        <option value="">Seleccionar Distrito</option>
+                        {formData.provincia &&
+                            (departamentosProvinciasDistritos[formData.departamento]?.[formData.provincia] || []).map(
+                                (dist) => (
+                                    <option key={dist} value={dist}>
+                                        {dist}
+                                    </option>
+                                )
+                            )}
+                    </select>
+                </div>
+            </div>
+            
+            {/* Dirección Field - ✅ Ensure correct field name */}
+            <div className="mt-4">
+                <label htmlFor="address" className="block text-gray-700">
+                    Dirección:
+                </label>
+                <input
+                    type="text"
+                    name="address"
+                    value={formData.address || ""}
+                    onChange={handleChange}
+                    maxLength="250"
+                    className="w-full border p-2 rounded"
+                    placeholder="Ingrese su dirección (máximo 250 caracteres)"
+                    required
+                />
+                <p className="text-sm text-gray-500">
+                    {formData.address ? formData.address.length : 0}/250 caracteres
+                </p>
+            </div>
 
-            <label htmlFor="distrito" className="block text-gray-700">
-                Distrito:
-            </label>
-            <select
-                name="distrito"
-                value={formData.distrito || ""}
-                onChange={handleChange}
-                className="w-full border p-2 mb-4 rounded"
-                disabled={!formData.provincia}
-                required
-            >
-                <option value="">Select Distrito</option>
-                {formData.provincia &&
-                    (departamentosProvinciasDistritos[formData.departamento]?.[formData.provincia] || []).map(
-                        (dist) => (
-                            <option key={dist} value={dist}>
-                                {dist}
-                            </option>
-                        )
-                    )}
-            </select>
-
-            <label htmlFor="direccion" className="block text-gray-700">
-                Dirección:
-            </label>
-            <textarea
-                name="direccion"
-                value={formData.direccion || ""}
-                onChange={handleChange}
-                maxLength="200"
-                className="w-full border p-2 mb-4 rounded"
-                placeholder="Ingrese su dirección (máximo 200 caracteres)"
-                required
-            ></textarea>
-            <p className="text-sm text-gray-500">
-                {formData.direccion ? formData.direccion.length : 0}/200 caracteres
-            </p>
-
-            <label htmlFor="googleLink" className="block text-gray-700">
-                Localización:
-            </label>
-            <input
-                type="url"
-                name="googleLink"
-                value={formData.googleLink || ""}
-                onChange={handleChange}
-                maxLength="350"
-                className="w-full border p-2 mb-4 rounded"
-                placeholder="Ingrese su link de localización (máximo 350 caracteres)"
-            />
+            
+            <div className="mt-4">
+                <label htmlFor="googleLink" className="block text-gray-700">
+                    Localización:
+                </label>
+                <input
+                    type="url"
+                    name="googleLink"
+                    value={formData.googleLink || ""}
+                    onChange={handleChange}
+                    maxLength="350"
+                    className="w-full border p-2 rounded"
+                    placeholder="Ingrese su link de localización (máximo 350 caracteres)"
+                />
+            </div>
         </>
     );
 };
