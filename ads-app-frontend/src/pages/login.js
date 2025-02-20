@@ -1,29 +1,31 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
+import { useAuth } from "../context/AuthContext"; // ✅ Use Auth Context
 import axios from "axios";
 
 const Login = () => {
   const router = useRouter();
+  const { login } = useAuth(); // ✅ Get login function from context
   const [formData, setFormData] = useState({ phoneNumber: "", password: "" });
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // Redirigir a usuarios autenticados fuera de la página de inicio de sesión
+  // ✅ Redirect authenticated users away from login page
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
       router.push("/dashboard");
     }
-  }, []);
+  }, [router]);
 
-  // Manejar cambios en los inputs
+  // ✅ Handle input changes
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  // Validar formulario
+  // ✅ Validate form fields
   const validateForm = () => {
     if (!formData.phoneNumber || !formData.password) {
       setError("Por favor, complete todos los campos.");
@@ -41,7 +43,7 @@ const Login = () => {
     return true;
   };
 
-  // Manejar envío del formulario
+  // ✅ Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validateForm()) return;
@@ -52,15 +54,13 @@ const Login = () => {
 
     try {
       const response = await axios.post("http://localhost:5000/api/users/login", formData);
-
       const { token, user } = response.data;
 
-      // Guardar token y detalles del usuario en localStorage
-      localStorage.setItem("token", token);
-      localStorage.setItem("user", JSON.stringify(user));
+      // ✅ Update global auth state
+      login(user, token);
 
       setSuccess("¡Inicio de sesión exitoso! Redirigiendo...");
-      setTimeout(() => router.push("/dashboard"), 1500);
+      setTimeout(() => router.push("/dashboard"), 500);
     } catch (err) {
       setError(err.response?.data?.message || "Error al iniciar sesión. Inténtelo de nuevo.");
       console.error("Error de inicio de sesión:", err.response?.data || err.message);

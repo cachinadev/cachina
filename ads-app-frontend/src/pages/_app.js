@@ -1,11 +1,13 @@
-import Layout from '../components/Layout';
-import '../styles/globals.css';
-import Head from 'next/head';
-import { useEffect } from 'react';
-import { AuthProvider } from '../context/AuthContext'; // Import AuthProvider
+import { useEffect } from "react";
+import Head from "next/head";
+import dynamic from "next/dynamic";
+import Layout from "../components/Layout";
+import { AuthProvider } from "../context/AuthContext"; // ✅ Ensure AuthProvider wraps the app
+import "../styles/globals.css";
 
-function MyApp({ Component, pageProps }) {
-  useEffect(() => {
+// ✅ Load Leaflet dynamically to avoid SSR issues
+const loadLeafletIcons = () => {
+  if (typeof window !== "undefined") {
     import("leaflet").then((L) => {
       delete L.Icon.Default.prototype._getIconUrl;
       L.Icon.Default.mergeOptions({
@@ -14,29 +16,32 @@ function MyApp({ Component, pageProps }) {
         shadowUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png",
       });
     });
+  }
+};
+
+function MyApp({ Component, pageProps }) {
+  useEffect(() => {
+    loadLeafletIcons();
   }, []);
 
   return (
-    <>
+    <AuthProvider> {/* ✅ Global Authentication Context */}
       <Head>
-        <title>Cachina - Buy, Sell, and Rent Easily</title>
-        <meta name="description" content="Find and post ads for your needs with ease on Cachina." />
+        <title>Cachina - Compra, Vende y Alquila Fácilmente</title>
+        <meta name="description" content="Encuentra y publica anuncios con facilidad en Cachina." />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <meta charSet="UTF-8" />
-        <meta property="og:title" content="Cachina - Your Best Marketplace" />
-        <meta property="og:description" content="Post and browse ads for services, rentals, and more." />
+        <meta property="og:title" content="Cachina - Tu Mejor Marketplace" />
+        <meta property="og:description" content="Publica y navega por anuncios de servicios, alquileres y más." />
         <meta property="og:image" content="/images/og-image.jpg" />
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://cachina.pe" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-
-      <AuthProvider> {/* Wrap the app with AuthProvider */}
-        <Layout>
-          <Component {...pageProps} />
-        </Layout>
-      </AuthProvider>
-    </>
+      <Layout>
+        <Component {...pageProps} />
+      </Layout>
+    </AuthProvider>
   );
 }
 

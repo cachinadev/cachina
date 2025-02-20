@@ -102,7 +102,7 @@ const CreateAd = ({ fetchUserDetails, fetchUserAds }) => {
 
     return (
         <form onSubmit={handleSubmit} className="space-y-6 bg-white p-6 rounded shadow-md">
-            <h1 className="text-2xl font-bold mb-4 text-center">📢 Difunde tu anuncio</h1>
+            <h1 className="text-2xl font-bold mb-4 text-center">📢 Difunde tu servicio/negocio y mas</h1>
 
             {error && <p className="text-red-500 text-center mb-4">{error}</p>}
 

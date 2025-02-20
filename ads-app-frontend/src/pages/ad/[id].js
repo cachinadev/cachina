@@ -101,11 +101,32 @@ const AdDetails = () => {
     const location = ad.googleLink ? parseGoogleMapsLink(ad.googleLink) : null;
     const position = location ? [location.lat, location.lng] : [-12.0464, -77.0428]; // Default Lima, Peru
 
-    const shareAd = () => {
-        const shareText = `Check out this ad on Cachina.pe:\nTitle: ${ad.title}\nCategory: ${ad.category}\nLocation: ${ad.departamento}, ${ad.provincia}, ${ad.distrito}\nCost: ${ad.currency} ${ad.cost || "Cotizar"}\nView more: ${window.location.href}`;
-        navigator.clipboard.writeText(shareText);
-        alert("Ad details copied to clipboard! Share it anywhere.");
-    };
+//    const shareAd = () => {
+//        const shareText = `Check out this ad on Cachina.pe:\nTitle: ${ad.title}\nCategory: ${ad.category}\nLocation: ${ad.departamento}, ${ad.provincia}, ${ad.distrito}\nCost: ${ad.currency} ${ad.cost || "Cotizar"}\nView more: ${window.location.href}`;
+//        navigator.clipboard.writeText(shareText);
+//        alert("Ad details copied to clipboard! Share it anywhere.");
+//    };
+
+const shareAd = () => {
+    const costo = ad.cost ? `${ad.currency} ${ad.cost}` : ad.currency === "Cotizar" ? "Cotizar" : `${ad.currency} Cotizar`;
+
+    const shareText = `📢 ¡Mira este anuncio en Cachina.pe! 🏡🔍
+
+📌 *Título:* ${ad.title}
+📂 *Categoría:* ${ad.category}
+📍 *Ubicación:* ${ad.departamento}, ${ad.provincia}, ${ad.distrito}
+🏠 *Dirección:* ${ad.address || "No especificada"}
+📞 *Teléfono:* ${ad.contactNumber || "No disponible"}
+💰 *Costo:* ${costo}
+🌍 *Ver ubicación:* ${ad.googleLink || "No disponible"}
+🔗 *Ver más detalles:* ${window.location.href}
+
+¡Contáctalos ahora y descubre más! 🚀`;
+
+    navigator.clipboard.writeText(shareText);
+    alert("¡Detalles del anuncio copiados al portapapeles! 📋 Ahora puedes compartirlo.");
+};
+
 
     const openWhatsApp = () => {
         const message = `Hello, I'm interested in your ad \"${ad.title}\" listed on Cachina.pe.`;
@@ -121,6 +142,32 @@ const AdDetails = () => {
 
     const formattedCost = ad.cost ? `${ad.cost} ${ad.currency}` : "Cotizar";
 
+    ////
+    const CustomPrevArrow = ({ onClick }) => {
+        return (
+            <button
+                onClick={onClick}
+                className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-gray-900 bg-opacity-30 hover:bg-opacity-60 text-white p-3 rounded-full z-10 transition-opacity"
+                aria-label="Previous Slide"
+            >
+                ◀
+            </button>
+        );
+    };
+    
+    const CustomNextArrow = ({ onClick }) => {
+        return (
+            <button
+                onClick={onClick}
+                className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-gray-900 bg-opacity-30 hover:bg-opacity-60 text-white p-3 rounded-full z-10 transition-opacity"
+                aria-label="Next Slide"
+            >
+                ▶
+            </button>
+        );
+    };    
+////
+
     const carouselSettings = {
         dots: true,
         infinite: true,
@@ -128,6 +175,8 @@ const AdDetails = () => {
         slidesToShow: 1,
         slidesToScroll: 1,
         arrows: true,
+        prevArrow: <CustomPrevArrow />,
+        nextArrow: <CustomNextArrow />,
     };
 
     const handleReviewSubmit = async (e) => {
@@ -144,7 +193,6 @@ const AdDetails = () => {
             alert("No se pudo enviar la reseña");
         }
     };
-
     
     return (
         <div className="container mx-auto px-4 py-8">
@@ -156,7 +204,7 @@ const AdDetails = () => {
               <h1 className="text-4xl font-extrabold tracking-tight leading-tight mb-1">{ad.title}</h1>
               <p className="text-lg font-medium opacity-90">{ad.category} • {ad.departamento}, {ad.provincia}, {ad.distrito}</p>
               <div className="flex items-center space-x-4 mt-2 text-sm opacity-80">
-                <p>Created by: <span className="font-semibold">{ad.createdBy?.name || "Unknown"}</span></p>
+                <p>Creado por: <span className="font-semibold">{ad.createdBy?.name || "Unknown"}</span></p>
                 <p className="flex items-center"><FaEye className="mr-1" /> {ad.views} Vistos</p>
               </div>
             </div>
@@ -181,20 +229,39 @@ const AdDetails = () => {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 {/* Left Content */}
                 <div className="lg:col-span-2">
-                    {/* Image Carousel */}
-                    <div className="bg-white p-6 shadow-lg rounded-lg mb-8">
-                        <Slider {...carouselSettings}>
-                            {ad.pictures.map((pic, index) => (
-                                <div key={index}>
-                                    <img
-                                        src={`http://localhost:5000${pic}`}
-                                        alt={`Ad Image ${index + 1}`}
-                                        className="rounded-lg object-cover w-full h-96"
-                                    />
-                                </div>
-                            ))}
-                        </Slider>
-                    </div>
+
+                {/* Image Carousel */}
+                {/* Image Carousel */}
+{/* Image Carousel */}
+{/* Image Carousel */}
+<div className="bg-white shadow-md rounded-lg mb-8 overflow-hidden relative">
+    {ad.pictures.length > 1 ? (
+        <Slider 
+            {...carouselSettings}
+            prevArrow={<CustomPrevArrow />}
+            nextArrow={<CustomNextArrow />}
+        >
+            {ad.pictures.map((pic, index) => (
+                <div key={index} className="w-full flex justify-center">
+                    <img 
+                        src={`http://localhost:5000${pic}`} 
+                        alt={`Ad Image ${index + 1}`} 
+                        className="w-full h-auto max-h-96 object-contain rounded-lg"
+                    />
+                </div>
+            ))}
+        </Slider>
+    ) : (
+        <div className="w-full flex justify-center">
+            <img 
+                src={`http://localhost:5000${ad.pictures[0]}`} 
+                alt="Ad" 
+                className="w-full h-auto max-h-96 object-contain rounded-lg"
+            />
+        </div>
+    )}
+</div>
+
 
     
                     {/* Description */}
@@ -233,85 +300,95 @@ const AdDetails = () => {
                 </div>
 
         
-                {/* Sticky Right Column */}
-                <div className="sticky top-8">
-                    <div className="bg-white p-6 shadow-lg rounded-lg space-y-6">
-                        
-                        {/* 🏷️ Cost & Availability */}
-                        <div className="bg-gray-100 p-4 rounded-lg">
-                            <p className="text-xl font-bold text-gray-800">💰 Costo: {formattedCost}</p>
-                            
-                            {/* ✅ Display Payment Methods */}
-                            {ad.paymentMethods && (
-                                <p className="text-gray-700 mt-2">
-                                    <strong>💳 Métodos de Pago:</strong> {ad.paymentMethods}
-                                </p>
-                            )}
+               {/* Sticky Right Column */}
+<div className="sticky top-8">
+  <div className="bg-white p-6 shadow-xl rounded-2xl space-y-6 border border-gray-200">
+    
+    {/* 💰 Cost & Availability Section */}
+    <div className="bg-gray-50 p-5 rounded-xl border-l-4 border-blue-500">
+      <p className="text-2xl font-extrabold text-gray-900 flex items-center gap-2">
+        💰 Costo: <span className="text-green-600">{formattedCost}</span>
+      </p>
 
-                            {/* ✅ Display Available Days */}
-                            {ad.availableDays && (
-                                <p className="text-gray-700">
-                                    <strong>📆 Días Disponibles:</strong> {ad.availableDays}
-                                </p>
-                            )}
+      {/* ✅ Payment Methods */}
+      {ad.paymentMethods && (
+        <p className="text-gray-700 mt-2 flex items-center">
+          <strong className="mr-2">💳 Métodos de Pago:</strong> {ad.paymentMethods}
+        </p>
+      )}
 
-                            {/* ✅ Display Available Hours */}
-                            {ad.availableHours && (
-                                <p className="text-gray-700">
-                                    <strong>🕒 Horario Disponible:</strong> {ad.availableHours}
-                                </p>
-                            )}
-                        </div>
+      {/* ✅ Available Days */}
+      {ad.availableDays && (
+        <p className="text-gray-700 flex items-center">
+          <strong className="mr-2">📆 Días Disponibles:</strong> {ad.availableDays}
+        </p>
+      )}
 
-                        {/* 📞 Contact & Action Buttons */}
-                        <div className="space-y-3">
-                            <a
-                                href={`tel:${ad.contactNumber}`}
-                                className="block bg-green-500 text-white text-center py-3 rounded-lg hover:bg-green-600 transition duration-300 shadow-md flex items-center justify-center gap-2"
-                            >
-                                <FaPhoneAlt /> Llamar Ahora
-                            </a>
+      {/* ✅ Available Hours */}
+      {ad.availableHours && (
+        <p className="text-gray-700 flex items-center">
+          <strong className="mr-2">🕒 Horario Disponible:</strong> {ad.availableHours}
+        </p>
+      )}
 
-                            <button
-                                onClick={openWhatsApp}
-                                className="block w-full bg-green-600 text-white text-center py-3 rounded-lg hover:bg-green-700 transition duration-300 shadow-md flex items-center justify-center gap-2"
-                            >
-                                <FaWhatsapp /> WhatsApp
-                            </button>
+      {/* ✅ Ad Address */}
+      {ad.address && (
+        <p className="text-gray-700 flex items-center">
+          <strong className="mr-2">📍 Dirección:</strong> {ad.address}
+        </p>
+      )}
+    </div>
 
-                            <button
-                                onClick={openTelegram}
-                                className="block w-full bg-blue-500 text-white text-center py-3 rounded-lg hover:bg-blue-600 transition duration-300 shadow-md flex items-center justify-center gap-2"
-                            >
-                                <FaTelegram /> Telegram
-                            </button>
+    {/* 📞 Contact & Action Buttons */}
+    <div className="space-y-4">
+      <a
+        href={`tel:${ad.contactNumber}`}
+        className="flex items-center justify-center gap-2 bg-green-500 text-white text-lg font-semibold py-3 rounded-xl hover:bg-green-600 transition duration-300 shadow-md"
+      >
+        <FaPhoneAlt className="text-xl" /> Llamar Ahora
+      </a>
 
-                            <button
-                                onClick={shareAd}
-                                className="block w-full bg-yellow-500 text-white text-center py-3 rounded-lg hover:bg-yellow-600 transition duration-300 shadow-md flex items-center justify-center gap-2"
-                            >
-                                <FaShareAlt /> Compartir
-                            </button>
-                        </div>
+      <button
+        onClick={openWhatsApp}
+        className="flex items-center justify-center gap-2 bg-green-600 text-white text-lg font-semibold py-3 rounded-xl hover:bg-green-700 transition duration-300 shadow-md w-full"
+      >
+        <FaWhatsapp className="text-xl" /> WhatsApp
+      </button>
 
-                        {/* 🌐 Website Link */}
-                        {ad.website && (
-                            <a
-                                href={ad.website}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="block text-blue-600 hover:underline text-center font-semibold"
-                            >
-                                🌍 Visitar Página Web
-                            </a>
-                        )}
+      <button
+        onClick={openTelegram}
+        className="flex items-center justify-center gap-2 bg-blue-500 text-white text-lg font-semibold py-3 rounded-xl hover:bg-blue-600 transition duration-300 shadow-md w-full"
+      >
+        <FaTelegram className="text-xl" /> Telegram
+      </button>
 
-                        {/* ⭐ Reviews Section */}
-                            <ReviewComponent adId={ad._id} user={user} />
-                      
+      <button
+        onClick={shareAd}
+        className="flex items-center justify-center gap-2 bg-yellow-500 text-white text-lg font-semibold py-3 rounded-xl hover:bg-yellow-600 transition duration-300 shadow-md w-full"
+      >
+        <FaShareAlt className="text-xl" /> Compartir
+      </button>
+    </div>
 
-                    </div>
-                </div>
+    {/* 🌍 Website Link */}
+    {ad.website && (
+      <a
+        href={ad.website}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="block text-center text-blue-600 hover:underline font-semibold mt-4"
+      >
+        🌍 Visitar Página Web
+      </a>
+    )}
+
+    {/* ⭐ Reviews Section */}
+    <div className="mt-6">
+      <ReviewComponent adId={ad._id} user={user} />
+    </div>
+  </div>
+</div>
+
 
             </div>
         </div>  
