@@ -9,7 +9,6 @@ const fs = require("fs");
 const mongoose = require("mongoose");
 const axios = require("axios");
 
-
 // Analytics Route (Static Route Comes First)
 router.get("/analytics", protect, async (req, res) => {
     try {
@@ -29,7 +28,7 @@ router.get("/analytics", protect, async (req, res) => {
     }
 });
 
-// Multer configuration for image uploads
+// ✅ Configure Multer for Image Uploads
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
         const uploadDir = path.join(__dirname, "../uploads");
@@ -40,8 +39,7 @@ const storage = multer.diskStorage({
     },
     filename: (req, file, cb) => {
         const ext = path.extname(file.originalname);
-        const filename = `${req.user.id}_${Date.now()}${ext}`;
-        cb(null, filename);
+        cb(null, `${Date.now()}${ext}`);
     },
 });
 
@@ -54,44 +52,92 @@ const upload = multer({
         }
         cb(null, true);
     },
-    limits: { fileSize: 5 * 1024 * 1024 }, // Limit file size to 5MB
+    limits: { fileSize: 5 * 1024 * 1024 },
 });
 
-// --- Route Handlers ---
+// ✅ Route: Create Ad with Images
+router.post("/create-ad", protect, upload.array("images", 5), async (req, res) => {
+    try {
+        console.log("📸 Ad Creation Request Received");
 
-// Ad creation with image upload
-router.post(
-    "/upload-images",
-    protect,
-    upload.array("images", 5), // Allow up to 5 images
-    async (req, res) => {
-        try {
-            const adData = { ...req.body };
-            adData.pictures = req.files.map((file) => `/uploads/${file.filename}`);
-            adData.createdBy = req.user.id;
-
-            if (!adData.title || !adData.description || !adData.category) {
-                return res.status(400).json({ message: "Title, Description, and Category are required." });
-            }
-
-            const ad = new Ad(adData);
-            await ad.save();
-
-            const user = await User.findById(req.user.id);
-            user.adsPosted.push(ad._id);
-            await user.save();
-
-            res.status(201).json({ message: "Ad created successfully", ad });
-        } catch (error) {
-            console.error("Error creating ad:", error.message);
-            res.status(500).json({ message: "Failed to create ad" });
+        if (!req.files || req.files.length === 0) {
+            return res.status(400).json({ message: "Please upload at least one image." });
         }
-    }
-);
 
-// Ad update route
+        const uploadedImages = req.files.map((file) => `/uploads/${file.filename}`);
+        const { title, description, category, contactNumber, ...otherFields } = req.body;
+
+        if (!title || !description || !category || !contactNumber) {
+            return res.status(400).json({ message: "Missing required fields." });
+        }
+
+        const newAd = new Ad({
+            title,
+            description,
+            category,
+            contactNumber,
+            ...otherFields,
+            pictures: uploadedImages,
+            createdBy: req.user.id,
+        });
+
+        await newAd.save();
+
+        const user = await User.findById(req.user.id);
+        user.adsPosted.push(newAd._id);
+        await user.save();
+
+        res.status(201).json({ message: "Ad created successfully", ad: newAd });
+
+    } catch (error) {
+        console.error("❌ Error creating ad:", error.message);
+        res.status(500).json({ message: "Failed to create ad" });
+    }
+});
+
+// ✅ Route: Upload New Images for an Existing Ad
+router.post("/:id/upload-images", protect, upload.array("images", 5), async (req, res) => {
+    try {
+        console.log(`📸 Uploading new images for ad: ${req.params.id}`);
+
+        const ad = await Ad.findById(req.params.id);
+        if (!ad) {
+            return res.status(404).json({ message: "Ad not found" });
+        }
+
+        if (ad.createdBy.toString() !== req.user.id) {
+            return res.status(403).json({ message: "Not authorized to update images" });
+        }
+
+        if (!req.files || req.files.length === 0) {
+            return res.status(400).json({ message: "Please upload at least one image." });
+        }
+
+        // ✅ Delete old images
+        ad.pictures.forEach((oldImage) => {
+            const oldImagePath = path.join(__dirname, "..", oldImage);
+            if (fs.existsSync(oldImagePath)) {
+                fs.unlinkSync(oldImagePath);
+            }
+        });
+
+        const uploadedImages = req.files.map((file) => `/uploads/${file.filename}`);
+        ad.pictures = uploadedImages;
+        await ad.save();
+
+        res.status(200).json({ message: "Images replaced successfully", pictures: ad.pictures });
+
+    } catch (error) {
+        console.error("❌ Error uploading images:", error.message);
+        res.status(500).json({ message: "Failed to upload images" });
+    }
+});
+
+// ✅ Route: Update Ad (Text and Existing Images)
 router.put("/:id", protect, async (req, res) => {
     try {
+        console.log(`✏️ Updating Ad: ${req.params.id}`);
+
         const ad = await Ad.findById(req.params.id);
         if (!ad) {
             return res.status(404).json({ message: "Ad not found" });
@@ -103,9 +149,10 @@ router.put("/:id", protect, async (req, res) => {
 
         const { pictures, ...otherFields } = req.body;
 
+        // ✅ Ensure existing pictures are kept
         const updatedFields = {
             ...otherFields,
-            pictures: pictures || ad.pictures,
+            pictures: pictures ? pictures : ad.pictures,
         };
 
         const updatedAd = await Ad.findByIdAndUpdate(req.params.id, updatedFields, {
@@ -114,13 +161,16 @@ router.put("/:id", protect, async (req, res) => {
         });
 
         res.status(200).json({ message: "Ad updated successfully", updatedAd });
+
     } catch (error) {
-        console.error("Error updating ad:", error.message);
+        console.error("❌ Error updating ad:", error.message);
         res.status(500).json({ message: "Failed to update ad" });
     }
 });
 
-// Serve uploaded images
+// ✅ Serve Uploaded Images
+router.use("/uploads", express.static(path.join(__dirname, "../uploads")));
+
 router.get("/uploads/:filename", (req, res) => {
     const imagePath = path.join(__dirname, "../uploads", req.params.filename);
     fs.access(imagePath, fs.constants.F_OK, (err) => {

@@ -3,6 +3,7 @@ const connectDB = require("./config/db");
 const cors = require("cors");
 const path = require("path");
 
+//
 require("dotenv").config();
 
 const app = express();
@@ -27,6 +28,13 @@ app.use("/api/ads", adRoutes);
 app.use("/api/reviews", reviewRoutes);
 app.use("/api/complaints", complaintRoutes);
 app.use("/api/rutas", routeRoutes); // ✅ Ensure correct API path
+app.use("/api/ads", require("./routes/adRoutes"));
+
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+
+app.get("/api/test", (req, res) => {
+    res.send("API is working!");
+});
 
 // 📂 Serve Uploaded Files (Images, Documents, etc.)
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));

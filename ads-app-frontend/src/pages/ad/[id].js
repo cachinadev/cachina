@@ -108,24 +108,40 @@ const AdDetails = () => {
 //    };
 
 const shareAd = () => {
-    const costo = ad.cost ? `${ad.currency} ${ad.cost}` : ad.currency === "Cotizar" ? "Cotizar" : `${ad.currency} Cotizar`;
-
     const shareText = `📢 ¡Mira este anuncio en Cachina.pe! 🏡🔍
 
-📌 *Título:* ${ad.title}
-📂 *Categoría:* ${ad.category}
-📍 *Ubicación:* ${ad.departamento}, ${ad.provincia}, ${ad.distrito}
-🏠 *Dirección:* ${ad.address || "No especificada"}
-📞 *Teléfono:* ${ad.contactNumber || "No disponible"}
-💰 *Costo:* ${costo}
-🌍 *Ver ubicación:* ${ad.googleLink || "No disponible"}
-🔗 *Ver más detalles:* ${window.location.href}
+📌 Título: ${ad.title}
+📂 Categoría: ${ad.category}
+📍 Ubicación: ${ad.departamento}, ${ad.provincia}, ${ad.distrito}
+🏠 Dirección: ${ad.address}
+📞 Teléfono: ${ad.contactNumber}
+💰 Costo: ${ad.currency} ${ad.cost || "Cotizar"}
+🌍 Ver ubicación: ${ad.googleLink || "No disponible"}
+🔗 Ver más detalles: ${window.location.href}
 
 ¡Contáctalos ahora y descubre más! 🚀`;
 
-    navigator.clipboard.writeText(shareText);
-    alert("¡Detalles del anuncio copiados al portapapeles! 📋 Ahora puedes compartirlo.");
+    if (navigator.clipboard && window.isSecureContext) {
+        // ✅ Modern browser with clipboard API (HTTPS only)
+        navigator.clipboard.writeText(shareText)
+            .then(() => alert("¡Detalles copiados al portapapeles! 📋"))
+            .catch(err => console.error("Error al copiar:", err));
+    } else {
+        // ❗ Fallback for HTTP & unsupported browsers
+        const textArea = document.createElement("textarea");
+        textArea.value = shareText;
+        document.body.appendChild(textArea);
+        textArea.select();
+        try {
+            document.execCommand("copy");
+            alert("¡Detalles copiados al portapapeles! 📋");
+        } catch (err) {
+            console.error("Error al copiar:", err);
+        }
+        document.body.removeChild(textArea);
+    }
 };
+
 
 
     const openWhatsApp = () => {
@@ -244,31 +260,42 @@ const shareAd = () => {
             {ad.pictures.map((pic, index) => (
                 <div key={index} className="w-full flex justify-center">
                     <img 
-                        src={`http://localhost:5000${pic}`} 
+                        src={pic ? `http://localhost:5000${pic}` : "/images/placeholder.png"} 
                         alt={`Ad Image ${index + 1}`} 
                         className="w-full h-auto max-h-96 object-contain rounded-lg"
+                        onError={(e) => (e.target.src = "/images/placeholder.png")}
                     />
                 </div>
             ))}
         </Slider>
-    ) : (
+    ) : ad.pictures.length === 1 ? (
         <div className="w-full flex justify-center">
             <img 
-                src={`http://localhost:5000${ad.pictures[0]}`} 
+                src={ad.pictures[0] ? `http://localhost:5000${ad.pictures[0]}` : "/images/placeholder.png"} 
                 alt="Ad" 
                 className="w-full h-auto max-h-96 object-contain rounded-lg"
+                onError={(e) => (e.target.src = "/images/placeholder.png")}
             />
+        </div>
+    ) : (
+        <div className="w-full flex justify-center bg-gray-200 h-96 flex items-center">
+            <p className="text-gray-500 text-lg">No hay imágenes disponibles</p>
         </div>
     )}
 </div>
-
-
+                   {/* 📖 Description Section */}
+<div className="bg-white p-6 shadow-lg rounded-lg mb-8 border-l-4 border-blue-500">
+    <h2 className="text-3xl font-bold text-blue-700 flex items-center gap-2 mb-4">
+        Descripción
+    </h2>
     
-                    {/* Description */}
-                    <div className="bg-white p-6 shadow-lg rounded-lg mb-8">
-                        <h2 className="text-2xl font-semibold mb-4">Description</h2>
-                        <p className="text-gray-700 leading-relaxed">{ad.description}</p>
-                    </div>
+    <div className="bg-gray-100 p-4 rounded-md">
+        <p className="text-gray-800 text-lg leading-relaxed font-medium">
+            {ad.description || "No hay descripción disponible para este anuncio."}
+        </p>
+    </div>
+</div>
+
     
                     {/* Location */}
                     <div className="bg-white p-6 shadow-lg rounded-lg mb-8">
@@ -301,94 +328,93 @@ const shareAd = () => {
 
         
                {/* Sticky Right Column */}
-<div className="sticky top-8">
-  <div className="bg-white p-6 shadow-xl rounded-2xl space-y-6 border border-gray-200">
-    
-    {/* 💰 Cost & Availability Section */}
-    <div className="bg-gray-50 p-5 rounded-xl border-l-4 border-blue-500">
-      <p className="text-2xl font-extrabold text-gray-900 flex items-center gap-2">
-        💰 Costo: <span className="text-green-600">{formattedCost}</span>
-      </p>
-
-      {/* ✅ Payment Methods */}
-      {ad.paymentMethods && (
-        <p className="text-gray-700 mt-2 flex items-center">
-          <strong className="mr-2">💳 Métodos de Pago:</strong> {ad.paymentMethods}
+    <div className="sticky top-8">
+    <div className="bg-white p-6 shadow-xl rounded-2xl space-y-6 border border-gray-200">
+        
+        {/* 💰 Cost & Availability Section */}
+        <div className="bg-gray-50 p-5 rounded-xl border-l-4 border-blue-500">
+        <p className="text-2xl font-extrabold text-gray-900 flex items-center gap-2">
+            💰 Costo: <span className="text-green-600">{formattedCost}</span>
         </p>
-      )}
 
-      {/* ✅ Available Days */}
-      {ad.availableDays && (
-        <p className="text-gray-700 flex items-center">
-          <strong className="mr-2">📆 Días Disponibles:</strong> {ad.availableDays}
-        </p>
-      )}
+        {/* ✅ Payment Methods */}
+        {ad.paymentMethods && (
+            <p className="text-gray-700 mt-2 flex items-center">
+            <strong className="mr-2">💳 Métodos de Pago:</strong> {ad.paymentMethods}
+            </p>
+        )}
 
-      {/* ✅ Available Hours */}
-      {ad.availableHours && (
-        <p className="text-gray-700 flex items-center">
-          <strong className="mr-2">🕒 Horario Disponible:</strong> {ad.availableHours}
-        </p>
-      )}
+        {/* ✅ Available Days */}
+        {ad.availableDays && (
+            <p className="text-gray-700 flex items-center">
+            <strong className="mr-2">📆 Días Disponibles:</strong> {ad.availableDays}
+            </p>
+        )}
 
-      {/* ✅ Ad Address */}
-      {ad.address && (
-        <p className="text-gray-700 flex items-center">
-          <strong className="mr-2">📍 Dirección:</strong> {ad.address}
-        </p>
-      )}
+        {/* ✅ Available Hours */}
+        {ad.availableHours && (
+            <p className="text-gray-700 flex items-center">
+            <strong className="mr-2">🕒 Horario Disponible:</strong> {ad.availableHours}
+            </p>
+        )}
+
+        {/* ✅ Ad Address */}
+        {ad.address && (
+            <p className="text-gray-700 flex items-center">
+            <strong className="mr-2">📍 Dirección:</strong> {ad.address}
+            </p>
+        )}
+        </div>
+
+        {/* 📞 Contact & Action Buttons */}
+        <div className="space-y-4">
+        <a
+            href={`tel:${ad.contactNumber}`}
+            className="flex items-center justify-center gap-2 bg-green-500 text-white text-lg font-semibold py-3 rounded-xl hover:bg-green-600 transition duration-300 shadow-md"
+        >
+            <FaPhoneAlt className="text-xl" /> Llamar Ahora
+        </a>
+
+        <button
+            onClick={openWhatsApp}
+            className="flex items-center justify-center gap-2 bg-green-600 text-white text-lg font-semibold py-3 rounded-xl hover:bg-green-700 transition duration-300 shadow-md w-full"
+        >
+            <FaWhatsapp className="text-xl" /> WhatsApp
+        </button>
+
+        <button
+            onClick={openTelegram}
+            className="flex items-center justify-center gap-2 bg-blue-500 text-white text-lg font-semibold py-3 rounded-xl hover:bg-blue-600 transition duration-300 shadow-md w-full"
+        >
+            <FaTelegram className="text-xl" /> Telegram
+        </button>
+
+        <button
+            onClick={shareAd}
+            className="flex items-center justify-center gap-2 bg-yellow-500 text-white text-lg font-semibold py-3 rounded-xl hover:bg-yellow-600 transition duration-300 shadow-md w-full"
+        >
+            <FaShareAlt className="text-xl" /> Compartir
+        </button>
+        </div>
+
+        {/* 🌍 Website Link */}
+        {ad.website && (
+        <a
+            href={ad.website}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="block text-center text-blue-600 hover:underline font-semibold mt-4"
+        >
+            🌍 Visitar Página Web
+        </a>
+        )}
+
+        {/* ⭐ Reviews Section */}
+        <div className="mt-6">
+        <ReviewComponent adId={ad._id} user={user} />
+        </div>
     </div>
-
-    {/* 📞 Contact & Action Buttons */}
-    <div className="space-y-4">
-      <a
-        href={`tel:${ad.contactNumber}`}
-        className="flex items-center justify-center gap-2 bg-green-500 text-white text-lg font-semibold py-3 rounded-xl hover:bg-green-600 transition duration-300 shadow-md"
-      >
-        <FaPhoneAlt className="text-xl" /> Llamar Ahora
-      </a>
-
-      <button
-        onClick={openWhatsApp}
-        className="flex items-center justify-center gap-2 bg-green-600 text-white text-lg font-semibold py-3 rounded-xl hover:bg-green-700 transition duration-300 shadow-md w-full"
-      >
-        <FaWhatsapp className="text-xl" /> WhatsApp
-      </button>
-
-      <button
-        onClick={openTelegram}
-        className="flex items-center justify-center gap-2 bg-blue-500 text-white text-lg font-semibold py-3 rounded-xl hover:bg-blue-600 transition duration-300 shadow-md w-full"
-      >
-        <FaTelegram className="text-xl" /> Telegram
-      </button>
-
-      <button
-        onClick={shareAd}
-        className="flex items-center justify-center gap-2 bg-yellow-500 text-white text-lg font-semibold py-3 rounded-xl hover:bg-yellow-600 transition duration-300 shadow-md w-full"
-      >
-        <FaShareAlt className="text-xl" /> Compartir
-      </button>
     </div>
-
-    {/* 🌍 Website Link */}
-    {ad.website && (
-      <a
-        href={ad.website}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="block text-center text-blue-600 hover:underline font-semibold mt-4"
-      >
-        🌍 Visitar Página Web
-      </a>
-    )}
-
-    {/* ⭐ Reviews Section */}
-    <div className="mt-6">
-      <ReviewComponent adId={ad._id} user={user} />
-    </div>
-  </div>
-</div>
-
 
             </div>
         </div>  

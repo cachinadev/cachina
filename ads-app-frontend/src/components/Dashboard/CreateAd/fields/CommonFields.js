@@ -122,7 +122,7 @@ const CommonFields = ({ formData, handleChange, handleFileChange }) => (
                 value={formData.description}
                 onChange={handleChange}
                 className="w-full border p-2 rounded"
-                placeholder="Pon todo lo que se necesita sobre tu negocio, servicio, negocio o producto, mas ayuda en sugenencias abajo"
+                placeholder="Pon todo lo que se necesita sobre tu negocio, servicio, negocio o producto, mas ayuda en sugerencias abajo"
                 required
             ></textarea>
         </div>
@@ -202,17 +202,6 @@ const CommonFields = ({ formData, handleChange, handleFileChange }) => (
                 onChange={handleChange}
                 className="w-full border p-2 rounded"
                 placeholder="Ingrese su página web o perfil social"
-            />
-        </div>
-        
-        <div>
-            <label className="block text-gray-700">Subir imágenes:</label>
-            <input
-                type="file"
-                name="pictures"
-                onChange={handleFileChange}
-                multiple
-                className="w-full border p-2 rounded"
             />
         </div>
     </>

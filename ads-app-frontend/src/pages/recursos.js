@@ -75,11 +75,6 @@ const Recursos = () => {
         <li>📧 <a href="mailto:cachinapuntope@gmail.com" className="text-blue-500 underline">cachinapuntope@gmail.com</a></li>
         <li>📞 Teléfono: +51 986 035 075</li>
       </ul>
-
-      {/* ✅ Footer */}
-      <div className="mt-6 text-center text-gray-500 text-sm">
-        © {new Date().getFullYear()} CACHINA PE E.I.R.L. - RUC: 20613204106. Todos los derechos reservados.
-      </div>
     </div>
   );
 };

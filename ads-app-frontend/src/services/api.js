@@ -8,7 +8,7 @@ const API = axios.create({
     baseURL: API_BASE_URL,
 });
 
-// Request Interceptor: Add Authorization header if token exists
+// ✅ Request Interceptor: Add Authorization header if token exists
 API.interceptors.request.use(
     (req) => {
         const token = localStorage.getItem("token");
@@ -24,6 +24,7 @@ API.interceptors.request.use(
 );
 
 // Response Interceptor: Global error handling
+// ✅ Response Interceptor: Handle errors globally
 API.interceptors.response.use(
     (response) => response,
     (error) => {
@@ -41,6 +42,7 @@ export const registerUser = async (userData) => {
     const { data } = await API.post('/users/register', userData);
     return data;
 };
+
 
 export const loginUser = async (credentials) => {
     const { data } = await API.post('/users/login', credentials);
@@ -115,47 +117,92 @@ export const getAdDetails = async (adId) => {
     return data;
 };
 
-export const createAd = async (adData) => {
-    const formData = new FormData();
 
-    Object.entries(adData).forEach(([key, value]) => {
-        if (key === "pictures" && Array.isArray(value)) {
-            // ✅ Append each image individually
-            value.forEach((file) => formData.append("images", file));
-        } else if (Array.isArray(value)) {
-            // ✅ Handle multiple selections (deporteType, categories, etc.), removing empty values
-            value.filter(item => item.trim() !== "").forEach(item => formData.append(key, item));
-        } else if (value !== null && value !== undefined && value !== "") {
-            // ✅ Avoid sending `null` or `undefined` values
-            formData.append(key, value);
-        }
-    });
-
-    // ✅ Ensure all necessary fields are sent properly
-    console.log("Sending FormData:", [...formData.entries()]);
-    console.log(formData.get("address")) ///Added
+// ✅ Delete an ad
+export const deleteAd = async (adId) => {
     try {
-        const { data } = await API.post('/ads/upload-images', formData, {
-            headers: { "Content-Type": "multipart/form-data" },
+        const { data } = await API.delete(`/ads/${adId}`, {
+            headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
         });
+        console.log("✅ Ad Deleted:", data);
         return data;
     } catch (error) {
-        console.error("Error creating ad:", error.response?.data || error.message);
+        console.error("❌ Delete Ad Error:", error.response?.data || error.message);
         throw error;
     }
 };
 
-export const deleteAd = async (adId) => {
-    const { data } = await API.delete(`/ads/${adId}`);
-    return data;
+// ✅ Create Ad with Images
+export const createAd = async (formData) => {
+    try {
+        console.log("🚀 Creating Ad...");
+        const { data } = await API.post("/ads/create-ad", formData, {
+            headers: { "Content-Type": "multipart/form-data" },
+        });
+
+        console.log("✅ Ad Created Successfully:", data);
+        return data;
+    } catch (error) {
+        console.error("❌ Create Ad Error:", error.response?.data || error.message);
+        throw error;
+    }
 };
 
-export const editAd = async (adId, updatedData) => {
-    const { data } = await API.put(`/ads/${adId}`, updatedData, {
-        headers: { "Content-Type": "application/json" },
-    });
-    return data;
+// ✅ Upload Images for Existing Ad
+export const uploadImages = async (adId, newImages) => {
+    if (newImages.length === 0) return [];
+
+    const formData = new FormData();
+    newImages.forEach((image) => formData.append("images", image));
+
+    try {
+        console.log("📤 Uploading New Images...");
+        const { data } = await API.post(`/ads/${adId}/upload-images`, formData, {
+            headers: { "Content-Type": "multipart/form-data" },
+        });
+
+        console.log("✅ Images Uploaded Successfully:", data);
+        return data.pictures || [];
+    } catch (error) {
+        console.error("❌ Error Uploading Images:", error.response?.data || error.message);
+        return [];
+    }
 };
+
+// ✅ Edit Ad (With Image Handling)
+export const editAd = async (adId, updatedData, newImages = []) => {
+    try {
+        console.log("📝 Editing Ad:", adId, updatedData);
+
+        let uploadedPictures = [];
+
+        // ✅ Upload new images if available
+        if (newImages.length > 0) {
+            uploadedPictures = await uploadImages(adId, newImages);
+        }
+
+        // ✅ Merge existing & new images
+        const formattedData = {
+            ...updatedData,
+            pictures: [...(updatedData.pictures || []), ...uploadedPictures],
+        };
+
+        console.log("📤 Final Ad Update Payload:", formattedData);
+        const { data } = await API.put(`/ads/${adId}`, formattedData, {
+            headers: { "Content-Type": "application/json" },
+        });
+
+        console.log("✅ Ad Updated Successfully:", data);
+        return data;
+    } catch (error) {
+        console.error("❌ Edit Ad Error:", error.response?.data || error.message);
+        throw error;
+    }
+};
+
+
+// ---------------- IMAGE UPLOAD FUNCTION ----------------
+
 
 // ---------------- REVIEW FUNCTIONS ----------------
 
@@ -183,18 +230,6 @@ export const UserAPI = {
     addToFavorites,
     removeFromFavorites,
     getFavorites, // ✅ Ensure this is included
-};
-
-export const AdAPI = {
-    fetchAds,
-    fetchMyAds,
-    getAdDetails,
-    createAd,
-    deleteAd,
-    editAd,
-    addReview,
-    getReviews,
-    deleteReview,
 };
 
 // ---------------- COMPLAINT FUNCTIONS ----------------
@@ -257,6 +292,18 @@ export const RoutesAPI = {
     fetchRoutes,
     getRouteDetails,
     getVehicleLocations,
+};
+
+export const AdAPI = {
+    fetchAds,
+    fetchMyAds,
+    getAdDetails,
+    createAd,
+    deleteAd,
+    editAd,
+    addReview,
+    getReviews,
+    deleteReview,
 };
 
 export const removeFavorite = async (adId) => {

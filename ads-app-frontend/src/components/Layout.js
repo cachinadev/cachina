@@ -17,8 +17,11 @@ const Layout = ({ children }) => {
   const router = useRouter();
   const { user, setUser, logout } = useAuth(); // ✅ Get user state & logout function
   const [menuOpen, setMenuOpen] = useState(false);
+  const [navOpen, setNavOpen] = useState(false);
   const [siteViews, setSiteViews] = useState(0); // 🔥 New State for Views
   const menuRef = useRef(null);
+
+  const toggleNav = () => setNavOpen((prev) => !prev);
 
   // ✅ Fetch user details dynamically when localStorage changes
   const fetchUserDetails = useCallback(() => {
@@ -80,6 +83,7 @@ const Layout = ({ children }) => {
     <div className="min-h-screen flex flex-col">
       {/* 🔵 Header */}
       <header className="bg-blue-600 text-white py-4 shadow-md flex justify-between items-center px-6">
+        
         {/* 🔹 Logo */}
         <div className="text-2xl font-bold cursor-pointer flex items-center gap-2" onClick={() => router.push("/")}>
           <FaHome /> Cachina.pe
@@ -89,28 +93,28 @@ const Layout = ({ children }) => {
 <nav className="hidden md:flex items-center gap-8 bg-blue-700 px-6 py-2 rounded-lg shadow-md">
   <button
     onClick={() => router.push("/negocios")}
-    className="text-white text-lg font-medium hover:text-green-300 flex items-center gap-2 transition-all duration-300"
+    className="text-white text-md font-medium hover:text-green-300 flex items-center gap-2 transition-all duration-300"
   >
     <FaBriefcase className="text-xl" /> Negocios
   </button>
 
   <button
     onClick={() => router.push("/recursos")}
-    className="text-white text-lg font-medium hover:text-green-300 flex items-center gap-2 transition-all duration-300"
+    className="text-white text-md font-medium hover:text-green-300 flex items-center gap-2 transition-all duration-300"
   >
     <FaSortAlphaUp className="text-xl" /> Recursos
   </button>
 
   <button
     onClick={() => router.push("/ayuda-contacto")}
-    className="text-white text-lg font-medium hover:text-green-300 flex items-center gap-2 transition-all duration-300"
+    className="text-white text-md font-medium hover:text-green-300 flex items-center gap-2 transition-all duration-300"
   >
     <FaQuestionCircle className="text-xl" /> Ayuda y Contacto
   </button>
 
   <button
     onClick={() => router.push("/rutas")}
-    className="text-white text-lg font-medium hover:text-green-300 flex items-center gap-2 transition-all duration-300"
+    className="text-white text-md font-medium hover:text-green-300 flex items-center gap-2 transition-all duration-300"
   >
     <FaBusAlt className="text-xl" /> Rutas
   </button>
@@ -175,6 +179,26 @@ const Layout = ({ children }) => {
           )}
         </div>
       </header>
+
+         {/* 🔹 Mobile Navigation */}
+         {navOpen && (
+        <nav className="md:hidden bg-blue-700 text-white text-lg py-
+        
+        flex flex-col gap-3 items-center">
+          <button onClick={() => router.push("/negocios")} className="nav-button">
+            <FaBriefcase /> Negocios
+          </button>
+          <button onClick={() => router.push("/recursos")} className="nav-button">
+            <FaSortAlphaUp /> Recursos
+          </button>
+          <button onClick={() => router.push("/ayuda-contacto")} className="nav-button">
+            <FaQuestionCircle /> Ayuda y Contacto
+          </button>
+          <button onClick={() => router.push("/rutas")} className="nav-button">
+            <FaBusAlt /> Rutas
+          </button>
+        </nav>
+      )}
 
       {/* 🔹 Main Content */}
       <main className="flex-1 container mx-auto px-4 py-6">{children}</main>

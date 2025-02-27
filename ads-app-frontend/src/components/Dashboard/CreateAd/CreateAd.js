@@ -11,44 +11,71 @@ const CreateAd = ({ fetchUserDetails, fetchUserAds }) => {
         departamento: "",
         provincia: "",
         distrito: "",
-        address: "",  // ✅ Ensure address is included
+        address: "",
         contactNumber: "",
         cost: "",
-        currency: "Cotizar", // ✅ Default to "Cotizar" if no cost
+        currency: "Cotizar",
         googleLink: "",
         pictures: [],
         availableHours: "",
         website: "",
-        paymentMethods: "", // ✅ Added to match backend
-        availableDays: "", // ✅ Added to match backend
+        paymentMethods: "",
+        availableDays: "",
     });
 
     const [error, setError] = useState("");
     const [success, setSuccess] = useState("");
+    const [imagePreviews, setImagePreviews] = useState([]);
 
+    // ✅ Handle text input changes
     const handleChange = (e) => {
-        const { name, value } = e.target;
+        const { name, value, type, checked } = e.target;
+        setFormData((prev) => {
+            if (type === "checkbox") {
+                return {
+                    ...prev,
+                    [name]: checked
+                        ? [...(prev[name] || []), value]
+                        : prev[name].filter((item) => item !== value),
+                };
+            }
+            return { ...prev, [name]: value };
+        });
+    };
+
+    // ✅ Handle file input changes
+    const handleFileChange = (e) => {
+        const files = Array.from(e.target.files);
+
+        if (files.length + formData.pictures.length > 5) {
+            setError("Puedes subir un máximo de 5 imágenes.");
+            return;
+        }
+
+        setFormData((prev) => ({ ...prev, pictures: [...prev.pictures, ...files] }));
+
+        // ✅ Generate image previews safely
+        const newPreviews = files.map((file) => ({
+            url: URL.createObjectURL(file),
+            file,
+        }));
+
+        setImagePreviews((prev) => [...prev, ...newPreviews]);
+    };
+
+    // ✅ Remove image
+    const handleRemoveImage = (index) => {
         setFormData((prev) => ({
             ...prev,
-            [name]: value,
-            ...(name === "cost" && (!value || value === "0") ? { currency: "Cotizar" } : {}), // ✅ Set "Cotizar" if cost is empty or 0
+            pictures: prev.pictures.filter((_, i) => i !== index),
         }));
+
+        // ✅ Revoke Object URL to free memory
+        URL.revokeObjectURL(imagePreviews[index].url);
+        setImagePreviews((prev) => prev.filter((_, i) => i !== index));
     };
 
-    const handleFileChange = (e) => {
-        setFormData((prev) => ({ ...prev, pictures: Array.from(e.target.files) }));
-    };
-
-    const handleCheckboxChange = (e, field) => {
-        const { value, checked } = e.target;
-        setFormData((prevData) => ({
-            ...prevData,
-            [field]: checked
-                ? [...(prevData[field] || []), value]
-                : prevData[field].filter((item) => item !== value),
-        }));
-    };
-
+    // ✅ Handle form submission
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError("");
@@ -70,10 +97,33 @@ const CreateAd = ({ fetchUserDetails, fetchUserAds }) => {
                 return;
             }
 
-            await createAd(formData);
+            // ✅ Convert `formData` to a `FormData` object
+            const formDataToSend = new FormData();
+
+            // ✅ Append all fields to FormData
+            Object.keys(formData).forEach((key) => {
+                if (key !== "pictures") {
+                    formDataToSend.append(key, formData[key]);
+                }
+            });
+
+            // ✅ Append images properly
+            formData.pictures.forEach((file) => {
+                formDataToSend.append("images", file);
+            });
+
+            // ✅ Debugging: Log all form data before sending
+            console.log("🚀 Submitting Ad FormData...");
+            for (let pair of formDataToSend.entries()) {
+                console.log(`${pair[0]}:`, pair[1]);
+            }
+
+            // ✅ Send request using `createAd` function
+            await createAd(formDataToSend);
 
             setSuccess("¡Anuncio creado exitosamente!");
 
+            // ✅ Reset Form
             setFormData({
                 title: "",
                 description: "",
@@ -81,28 +131,30 @@ const CreateAd = ({ fetchUserDetails, fetchUserAds }) => {
                 departamento: "",
                 provincia: "",
                 distrito: "",
-                address: "",  // ✅ Ensure address is included
+                address: "",
                 contactNumber: "",
                 cost: "",
-                currency: "Cotizar", // ✅ Reset to default after submit
+                currency: "Cotizar",
                 googleLink: "",
                 pictures: [],
-                availableDays: "", // ✅ Reset to empty after submit
+                availableDays: "",
                 website: "",
                 paymentMethods: "",
             });
+
+            setImagePreviews([]);
 
             fetchUserDetails();
             fetchUserAds();
         } catch (err) {
             setError(err.response?.data?.message || "No se pudo crear el anuncio. Intente nuevamente.");
-            console.error("Error al crear el anuncio:", err);
+            console.error("❌ Error al crear el anuncio:", err);
         }
     };
 
     return (
         <form onSubmit={handleSubmit} className="space-y-6 bg-white p-6 rounded shadow-md">
-            <h1 className="text-2xl font-bold mb-4 text-center">📢 Difunde tu servicio/negocio y mas</h1>
+            <h1 className="text-2xl font-bold mb-4 text-center">📢 Difunde tu servicio/negocio y más</h1>
 
             {error && <p className="text-red-500 text-center mb-4">{error}</p>}
 
@@ -114,35 +166,62 @@ const CreateAd = ({ fetchUserDetails, fetchUserAds }) => {
                 </div>
             )}
 
-            {/* Campos Comunes */}
-            <CommonFields
-                formData={formData}
-                handleChange={handleChange}
-                handleFileChange={handleFileChange}
-            />
+            {/* 🔹 Common Fields */}
+            <CommonFields formData={formData} handleChange={handleChange} handleFileChange={handleFileChange} />
 
-            {/* Campos Específicos de la Categoría */}
-            <CategoryFields
-                category={formData.category}
-                formData={formData}
-                handleChange={handleChange}
-                handleCheckboxChange={handleCheckboxChange}
-            />
+            {/* 🔹 Category-Specific Fields */}
+            <CategoryFields category={formData.category} formData={formData} handleChange={handleChange} />
 
-            <button
-                type="submit"
-                className="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600 transition duration-200"
-            >
+            {/* 🔹 Image Upload Section */}
+            <div>
+                <h3 className="font-bold mb-2">📸 Imágenes del Anuncio</h3>
+
+                {/* ✅ Custom File Input */}
+                <label className="cursor-pointer bg-gray-200 text-gray-700 py-2 px-4 rounded-md hover:bg-gray-300 transition-all inline-block">
+                    📂 Seleccionar Imágenes
+                    <input
+                        type="file"
+                        multiple
+                        accept="image/png, image/jpeg, image/jpg"
+                        onChange={handleFileChange}
+                        className="hidden"
+                    />
+                </label>
+
+                {/* ✅ Display selected file names (if any) */}
+                {formData.pictures.length > 0 ? (
+                    <p className="mt-2 text-sm text-gray-600">
+                        {formData.pictures.length} archivo(s) seleccionado(s)
+                    </p>
+                ) : (
+                    <p className="mt-2 text-sm text-gray-500">Ningún archivo seleccionado</p>
+                )}
+
+                {/* ✅ Display image previews */}
+                <div className="grid grid-cols-3 gap-4 mt-3">
+                    {imagePreviews.map((preview, index) => (
+                        <div key={index} className="relative">
+                            <img
+                                src={preview.url}
+                                alt={`Preview ${index + 1}`}
+                                className="w-full h-32 object-cover rounded-md shadow-md"
+                            />
+                            <button
+                                type="button"
+                                onClick={() => handleRemoveImage(index)}
+                                className="absolute top-2 right-2 bg-red-600 text-white p-1 rounded-full text-xs shadow-md"
+                            >
+                                ❌
+                            </button>
+                        </div>
+                    ))}
+                </div>
+            </div>
+
+            {/* 🔹 Submit Button */}
+            <button type="submit" className="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600 transition duration-200">
                 📢 Publicar Anuncio
             </button>
-
-            {success && (
-                <div className="text-center mt-4">
-                    <p className="text-gray-600 text-sm">
-                        🎉 Tu anuncio ha sido publicado con éxito. ¡Esperamos que recibas muchas visitas y clientes!
-                    </p>
-                </div>
-            )}
         </form>
     );
 };
