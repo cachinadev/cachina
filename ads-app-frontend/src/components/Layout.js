@@ -18,7 +18,7 @@ const Layout = ({ children }) => {
   const { user, setUser, logout } = useAuth(); // ✅ Get user state & logout function
   const [menuOpen, setMenuOpen] = useState(false);
   const [navOpen, setNavOpen] = useState(false);
-  const [siteViews, setSiteViews] = useState(0); // 🔥 New State for Views
+  const [siteViews, setSiteViews] = useState(0);
   const menuRef = useRef(null);
 
   const toggleNav = () => setNavOpen((prev) => !prev);
@@ -40,11 +40,19 @@ const Layout = ({ children }) => {
     }
   }, [setUser]);
 
-  // ✅ Fetch user details on mount & sync across tabs
+  // ✅ Sync User Across Tabs & Handle Token Expiry
   useEffect(() => {
     fetchUserDetails();
-    window.addEventListener("storage", fetchUserDetails);
-    return () => window.removeEventListener("storage", fetchUserDetails);
+    
+    const handleStorageChange = () => {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        setUser(null); // ✅ Ensure UI updates when logged out
+      }
+    };
+
+    window.addEventListener("storage", handleStorageChange);
+    return () => window.removeEventListener("storage", handleStorageChange);
   }, [fetchUserDetails]);
 
   // ✅ Track Site Views (LocalStorage-based)
@@ -57,10 +65,11 @@ const Layout = ({ children }) => {
 
   // ✅ Logout function (updates UI immediately)
   const handleLogout = useCallback(() => {
-    logout(); // ✅ Use AuthContext logout function
+    logout(); // ✅ Clears token & user data
+    setUser(null); // ✅ Ensures UI updates instantly
     setMenuOpen(false);
     router.push("/");
-  }, [logout, router]);
+  }, [logout, router, setUser]);
 
   // ✅ Navigate to dashboard (Create Ad tab first)
   const navigateToDashboard = useCallback(() => {
@@ -89,42 +98,34 @@ const Layout = ({ children }) => {
           <FaHome /> Cachina.pe
         </div>
 
-        {/* 🔹 Navigation Links */}
-<nav className="hidden md:flex items-center gap-8 bg-blue-700 px-6 py-2 rounded-lg shadow-md">
-  <button
-    onClick={() => router.push("/negocios")}
-    className="text-white text-md font-medium hover:text-green-300 flex items-center gap-2 transition-all duration-300"
-  >
-    <FaBriefcase className="text-xl" /> Negocios
+       {/* 🔹 Navigation Links */}
+<nav className="hidden md:flex items-center gap-6 bg-blue-700 px-6 py-2 rounded-lg shadow-md">
+  <button onClick={() => router.push("/negocios")} className="flex items-center gap-2 text-white text-md font-medium hover:text-green-300 transition-all duration-300">
+    <FaBriefcase className="text-lg" />
+    <span>Negocios</span>
   </button>
 
-  <button
-    onClick={() => router.push("/recursos")}
-    className="text-white text-md font-medium hover:text-green-300 flex items-center gap-2 transition-all duration-300"
-  >
-    <FaSortAlphaUp className="text-xl" /> Recursos
+  <button onClick={() => router.push("/recursos")} className="flex items-center gap-2 text-white text-md font-medium hover:text-green-300 transition-all duration-300">
+    <FaSortAlphaUp className="text-lg" />
+    <span>Recursos</span>
   </button>
 
-  <button
-    onClick={() => router.push("/ayuda-contacto")}
-    className="text-white text-md font-medium hover:text-green-300 flex items-center gap-2 transition-all duration-300"
-  >
-    <FaQuestionCircle className="text-xl" /> Ayuda y Contacto
+  <button onClick={() => router.push("/ayuda-contacto")} className="flex items-center gap-2 text-white text-md font-medium hover:text-green-300 transition-all duration-300">
+    <FaQuestionCircle className="text-lg" />
+    <span>Ayuda y Contacto</span>
   </button>
 
-  <button
-    onClick={() => router.push("/rutas")}
-    className="text-white text-md font-medium hover:text-green-300 flex items-center gap-2 transition-all duration-300"
-  >
-    <FaBusAlt className="text-xl" /> Rutas
+  <button onClick={() => router.push("/rutas")} className="flex items-center gap-2 text-white text-md font-medium hover:text-green-300 transition-all duration-300">
+    <FaBusAlt className="text-lg" />
+    <span>Rutas</span>
   </button>
 
-  {/* 👀 Visitas al sitio (Styled as a badge) */}
-  <div className="flex items-center bg-gray-800 px-4 py-1.5 rounded-full shadow-lg text-white text-sm font-semibold">
-    <FaEye className="text-green-300 mr-2" /> Visitas: {siteViews}
+  {/* 👀 Site Visits */}
+  <div className="flex items-center gap-2 bg-gray-800 px-4 py-1.5 rounded-full shadow-lg text-white text-sm font-semibold">
+    <FaEye className="text-green-300" />
+    <span>Visitas: {siteViews}</span>
   </div>
 </nav>
-
 
         {/* 🔹 User Menu */}
         <div className="relative" ref={menuRef}>
@@ -142,7 +143,7 @@ const Layout = ({ children }) => {
               {/* 🔽 Dropdown Menu */}
               {menuOpen && (
                 <div className="absolute right-0 mt-2 w-48 bg-white text-gray-700 shadow-lg rounded-md overflow-hidden z-50">
-                  {/* 📌 Dashboard (Redirects to Create Ad first) */}
+                  {/* 📌 Dashboard */}
                   <button
                     onClick={navigateToDashboard}
                     className="w-full flex items-center gap-2 px-4 py-2 hover:bg-gray-100 transition"
@@ -161,7 +162,7 @@ const Layout = ({ children }) => {
               )}
             </div>
           ) : (
-            // Login & Register Buttons
+            // ✅ Show "Anunciar" and "Registrarse" if user is not logged in
             <div className="flex gap-3">
               <button
                 onClick={() => router.push("/login")}
@@ -180,52 +181,12 @@ const Layout = ({ children }) => {
         </div>
       </header>
 
-         {/* 🔹 Mobile Navigation */}
-         {navOpen && (
-        <nav className="md:hidden bg-blue-700 text-white text-lg py-
-        
-        flex flex-col gap-3 items-center">
-          <button onClick={() => router.push("/negocios")} className="nav-button">
-            <FaBriefcase /> Negocios
-          </button>
-          <button onClick={() => router.push("/recursos")} className="nav-button">
-            <FaSortAlphaUp /> Recursos
-          </button>
-          <button onClick={() => router.push("/ayuda-contacto")} className="nav-button">
-            <FaQuestionCircle /> Ayuda y Contacto
-          </button>
-          <button onClick={() => router.push("/rutas")} className="nav-button">
-            <FaBusAlt /> Rutas
-          </button>
-        </nav>
-      )}
-
       {/* 🔹 Main Content */}
       <main className="flex-1 container mx-auto px-4 py-6">{children}</main>
 
       {/* 🔹 Footer */}
       <footer className="bg-gray-900 text-white py-8 text-center">
-        <div className="container mx-auto flex flex-col md:flex-row justify-between px-6">
-          {/* 🌐 Navigation Links */}
-          <div className="flex flex-col space-y-2 md:w-1/3">
-            <a href="/nosotros" className="text-gray-400 hover:text-white">Nosotros</a>
-            <a href="/politica-de-privacidad" className="text-gray-400 hover:text-white">Política de Privacidad</a>
-            <a href="/ayuda-contacto" className="text-gray-400 hover:text-white">Ayuda y Contacto</a>
-          </div>
-
-          <div className="flex flex-col space-y-2 md:w-1/3">
-            <a href="/terminos-condiciones" className="text-gray-400 hover:text-white">Términos y Condiciones</a>
-            <a href="/trabaja-con-nosotros" className="text-gray-400 hover:text-white">Trabaja con Nosotros</a>
-            <a href="/libro-reclamaciones" className="text-gray-400 hover:text-white">Libro de Reclamaciones 📜</a>
-          </div>
-
-          {/* 📞 Contact Details & Views */}
-          <div className="text-gray-400 md:w-1/3">
-            <p>📞 Teléfono: <a href="tel:+51986035075" className="hover:text-white">+51 986 035 075</a></p>
-            <p>📧 Email: <a href="mailto:cachinapuntope@gmail.com" className="hover:text-white">cachinapuntope@gmail.com</a></p>
-            <p className="mt-2">CACHINA PE E.I.R.L. <br /> RUC: 20613204106</p>
-            </div>
-        </div>
+        <p>CACHINA PE E.I.R.L. - RUC: 20613204106</p>
       </footer>
     </div>
   );

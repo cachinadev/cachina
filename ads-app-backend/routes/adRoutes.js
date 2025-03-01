@@ -28,6 +28,25 @@ router.get("/analytics", protect, async (req, res) => {
     }
 });
 
+// Remove from Favorites Route
+router.delete("/users/favorites/:adId", protect, async (req, res) => {
+    try {
+        const ad = await Ad.findById(req.params.adId);
+        if (!ad) return res.status(404).json({ message: "Ad not found" });
+
+        const user = await User.findById(req.user.id);
+        if (!user) return res.status(404).json({ message: "User not found" });
+
+        user.favorites = user.favorites.filter((favId) => favId.toString() !== ad._id.toString());
+        await user.save();
+
+        res.json({ message: "Ad removed from favorites successfully" });
+    } catch (error) {
+        console.error("Error removing favorite:", error);
+        res.status(500).json({ message: "Server error", error: error.message });
+    }
+});
+
 // ✅ Configure Multer for Image Uploads
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {

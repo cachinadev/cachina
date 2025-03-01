@@ -22,12 +22,20 @@ const DashboardSidebar = ({ user, activeTab, setActiveTab, handleLogout }) => {
     if (user) {
       fetchData();
     }
-  }, [user]);
+  }, [user]); // ✅ Updates when `user` changes
 
-  // ✅ Ensure the dashboard always starts with "Create Ad" when accessed
   useEffect(() => {
-    setActiveTab("createAd");
-  }, []);
+    const fetchFavorites = async () => {
+      try {
+        const updatedFavorites = await getFavorites();
+        setFavorites(updatedFavorites);
+      } catch (error) {
+        console.error("Error fetching updated favorites:", error);
+      }
+    };
+
+    fetchFavorites();
+  }, [activeTab]); // ✅ Refresh favorites when user switches tabs
 
   if (!user) {
     return (
@@ -40,6 +48,7 @@ const DashboardSidebar = ({ user, activeTab, setActiveTab, handleLogout }) => {
   return (
     <aside className="w-1/4 bg-gray-800 text-white h-screen flex flex-col justify-between">
       <div className="p-6">
+        {/* User Info */}
         <div className="flex items-center mb-6">
           <FaUserCircle className="text-4xl text-white mr-3" />
           <div>
@@ -48,22 +57,22 @@ const DashboardSidebar = ({ user, activeTab, setActiveTab, handleLogout }) => {
           </div>
         </div>
 
+        {/* Plan Info */}
         <div className="mb-6">
           <p className="text-sm text-gray-400 mb-1">Plan:</p>
           <p className="text-lg font-medium text-green-400">{user?.planType || "N/A"}</p>
         </div>
 
+        {/* Ad Stats */}
         <div className="mb-6">
           <p className="text-sm text-gray-400 mb-1">Anuncios publicados:</p>
-          <p className="text-lg font-medium text-yellow-300">
-            {adsPostedCount}
-          </p>
+          <p className="text-lg font-medium text-yellow-300">{adsPostedCount}</p>
         </div>
 
-        {/* 📌 Navigation Links */}
+        {/* Navigation Links */}
         <nav className="mt-6">
           <ul>
-            {/* ✅ Create Ad First (Default Active) */}
+            {/* ✅ Create Ad */}
             <li
               className={`flex items-center gap-3 p-3 rounded-md cursor-pointer ${
                 activeTab === "createAd" ? "bg-gray-700 text-white" : "hover:bg-gray-700 hover:text-white"
@@ -74,7 +83,7 @@ const DashboardSidebar = ({ user, activeTab, setActiveTab, handleLogout }) => {
               <span>Crea Anuncio</span>
             </li>
 
-            {/* ✅ AllAds Section */}
+            {/* ✅ All Ads */}
             <li
               className={`flex items-center gap-3 p-3 rounded-md cursor-pointer mt-3 ${
                 activeTab === "allAds" ? "bg-gray-700 text-white" : "hover:bg-gray-700 hover:text-white"
@@ -85,6 +94,7 @@ const DashboardSidebar = ({ user, activeTab, setActiveTab, handleLogout }) => {
               <span>Todos los anuncios</span>
             </li>
 
+            {/* ✅ Favorites (Dynamically Updates) */}
             <li
               className={`flex items-center gap-3 p-3 rounded-md cursor-pointer mt-3 ${
                 activeTab === "favorites" ? "bg-gray-700 text-white" : "hover:bg-gray-700 hover:text-white"
@@ -95,6 +105,7 @@ const DashboardSidebar = ({ user, activeTab, setActiveTab, handleLogout }) => {
               <span>Favoritos ({favorites.length})</span>
             </li>
 
+            {/* ✅ Analytics */}
             <li
               className={`flex items-center gap-3 p-3 rounded-md cursor-pointer mt-3 ${
                 activeTab === "analytics" ? "bg-gray-700 text-white" : "hover:bg-gray-700 hover:text-white"

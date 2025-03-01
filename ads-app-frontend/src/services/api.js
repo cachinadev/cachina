@@ -307,16 +307,14 @@ export const AdAPI = {
 };
 
 export const removeFavorite = async (adId) => {
-    const token = localStorage.getItem("token");
-    await fetch(`/api/favorites/${adId}`, {
-        method: "DELETE",
-        headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-        },
-    });
+    try {
+        const { data } = await API.delete(`/users/favorites/${adId}`);
+        return data;
+    } catch (error) {
+        console.error("Error removing from favorites:", error.response?.data || error.message);
+        throw error;
+    }
 };
-
 
 // Default Export
 export default API;
