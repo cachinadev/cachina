@@ -129,11 +129,14 @@ const LandingPage = () => {
                                     <strong className="text-gray-700">Costo:</strong> {ad.cost} {ad.currency}
                                 </div>
                                 <div className="text-sm text-gray-500 mb-1">
+                                {ad.createdBy?.name || "Desconocido"} <strong className="text-gray-700">-</strong> {formatDistanceToNow(parseISO(ad.createdAt), { addSuffix: true })}
+                                   {/* <strong className="text-gray-700">Publicado por:</strong> {ad.createdBy?.name || "Desconocido"}
                                     <strong className="text-gray-700">Publicado por:</strong> {ad.createdBy?.name || "Desconocido"}
+                                   */}
                                 </div>
-                                <div className="text-sm text-gray-500">
+                               {/* <div className="text-sm text-gray-500">
                                     <strong className="text-gray-700">Publicado:</strong> {formatDistanceToNow(parseISO(ad.createdAt), { addSuffix: true })}
-                                </div>
+                                </div>*/}
                             </div>
                         </div>
                     ))}

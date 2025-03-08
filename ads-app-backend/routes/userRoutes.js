@@ -209,4 +209,28 @@ router.get("/favorites", protect, async (req, res) => {
     }
 });
 
+// ✅ Route to fetch a user's ads by username
+router.get("/:username/ads", async (req, res) => {
+    try {
+        const username = req.params.username.toLowerCase(); // Normalize to lowercase
+        console.log("🔍 Looking for user:", username);
+
+        // ✅ Find user by username
+        const user = await User.findOne({ username: username });
+
+        if (!user) {
+            console.log("❌ User not found");
+            return res.status(404).json({ message: "Usuario no encontrado." });
+        }
+
+        // ✅ Fetch user's ads
+        const ads = await Ad.find({ _id: { $in: user.adsPosted } });
+        res.json(ads);
+    } catch (error) {
+        console.error("❌ Error fetching user ads:", error);
+        res.status(500).json({ message: "Error en el servidor." });
+    }
+});
+
+
 module.exports = router;

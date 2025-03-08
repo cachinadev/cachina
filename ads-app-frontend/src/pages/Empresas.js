@@ -4,7 +4,7 @@ const Negocios = () => {
     return (
         <div className="max-w-4xl mx-auto p-8 bg-white shadow-md rounded-lg">
             {/* 🔹 Header Section */}
-            <div className="bg-blue-600 text-white p-6 rounded-t-lg text-center">
+            <div className="bg-red-600 text-white p-6 rounded-t-lg text-center">
                 <h1 className="text-3xl font-bold">Impulsa Tu Negocio con Cachina.pe</h1>
                 <p className="text-sm mt-2">Llega a miles de clientes y aumenta tus ventas con nuestra plataforma.</p>
             </div>
@@ -19,13 +19,28 @@ const Negocios = () => {
                     <li><strong> Seguridad y confianza:</strong> Protección de datos y sistema de validación de anuncios.</li>
                 </ul>
 
+                {/* 🔹 Business Contracts */}
+                <h2 className="text-2xl font-semibold mt-8 mb-4"> Contratos Empresariales (Contáctanos)</h2>
+                <ul className="list-disc list-inside space-y-2">
+                    <li><strong>💼 Precios personalizados</strong> según tus necesidades.</li>
+                    <li><strong>📢 Publicaciones ilimitadas</strong> para maximizar tu alcance.</li>
+                    <li><strong>📊 Analíticas detalladas</strong> sobre el impacto de tus anuncios.</li>
+                </ul>
+
+                {/* 🔹 Service Placement */}
+                <h2 className="text-2xl font-semibold mt-8 mb-4"> Colocación de Servicios (Contáctanos)</h2>
+                <ul className="list-disc list-inside space-y-2">
+                    <li><strong>🏅 Publicación vitalicia</strong> para anuncios en servicios.</li>
+                </ul>
+                <p className="mt-4">🚀 Todos los planes y ofertas comerciales incluyen respaldo y soporte en marketing.</p>
+
                 {/* 🔹 Contact CTA */}
                 <h2 className="text-2xl font-semibold mt-8 mb-4"> Hablemos de Negocios</h2>
                 <p>
                     ¿Listo para llevar tu empresa al siguiente nivel? Contáctanos y recibe una propuesta personalizada:
                 </p>
                 <p className="mt-4"><strong>📧 Email:</strong> <a href="mailto:cachinapuntope@gmail.com" className="text-blue-500 font-semibold underline">cachinapuntope@gmail.com</a></p>
-                <p className="mt-2"><strong>📞 Teléfono:</strong> +51 986 035 075</p>
+                <p className="mt-2"><strong>📞 Teléfono:</strong> +51 985 979 119</p>
 
                 {/* 🔹 Call-to-Action */}
                 <div className="mt-6 text-center">
@@ -39,3 +54,4 @@ const Negocios = () => {
 };
 
 export default Negocios;
+

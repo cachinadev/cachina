@@ -4,10 +4,19 @@ const userSchema = new mongoose.Schema({
     phoneNumber: {
         type: String,
         required: true,
+        unique: true,
+        trim: true, // Ensure no extra spaces
     },
     name: {
         type: String,
         required: true,
+        trim: true, // Remove spaces from start & end
+    },
+    username: {
+        type: String,
+        unique: true,
+        lowercase: true,
+        trim: true, // ✅ Ensure lowercase & trimmed for easier lookups
     },
     password: {
         type: String,
@@ -57,6 +66,14 @@ const userSchema = new mongoose.Schema({
             default: Date.now
         }
     }]
+});
+
+// ✅ Auto-generate `username` field when saving user
+userSchema.pre("save", function (next) {
+    if (!this.username) {
+        this.username = this.name.toLowerCase().replace(/\s+/g, ""); // Remove spaces & convert to lowercase
+    }
+    next();
 });
 
 module.exports = mongoose.model("User", userSchema);

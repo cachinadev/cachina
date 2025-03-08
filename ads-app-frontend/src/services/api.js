@@ -54,6 +54,18 @@ export const getUserDetails = async () => {
     return data;
 };
 
+
+// ✅ Fetch Ads by Username (For Profile Pages)
+export const getUserAds = async (username) => {
+    try {
+        const { data } = await API.get(`/users/${username}/ads`);
+        return data;
+    } catch (error) {
+        console.error("❌ Error fetching user ads:", error.response?.data || error.message);
+        return []; // Return empty array on failure
+    }
+};
+
 // Add to Favorites
 export const addToFavorites = async (adId) => {
     try {
@@ -227,6 +239,7 @@ export const UserAPI = {
     registerUser,
     loginUser,
     getUserDetails,
+    getUserAds, // ✅ Added User Ads
     addToFavorites,
     removeFromFavorites,
     getFavorites, // ✅ Ensure this is included

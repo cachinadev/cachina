@@ -1,3 +1,5 @@
+import React, { useCallback, useMemo } from "react";
+
 const SearchFilter = ({
     category,
     setCategory,
@@ -11,103 +13,87 @@ const SearchFilter = ({
     setDistrito,
     uniqueFilters
 }) => {
-    const handleReset = () => {
+    // Reset all filters
+    const handleReset = useCallback(() => {
         setSearchTerm("");
         setCategory("");
         setDepartamento("");
         setProvincia("");
         setDistrito("");
-    };
+    }, [setSearchTerm, setCategory, setDepartamento, setProvincia, setDistrito]);
 
-    const handleDepartamentoChange = (e) => {
-        setDepartamento(e.target.value);
-        setProvincia(""); // Reset Provincia
-        setDistrito(""); // Reset Distrito
-    };
+    // Handle changes efficiently
+    const handleChange = useCallback((setter, resetters = []) => (e) => {
+        setter(e.target.value);
+        resetters.forEach(reset => reset(""));
+    }, []);
 
-    const handleProvinciaChange = (e) => {
-        setProvincia(e.target.value);
-        setDistrito(""); // Reset Distrito
-    };
+    // Memoized filter options for better performance
+    const generateOptions = useCallback((items) => (
+        items?.map((item, idx) => <option key={idx} value={item}>{item}</option>)
+    ), []);
 
     return (
-        <div className="mb-8 bg-gray-100 p-6 rounded-lg shadow-md">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="mb-8 bg-gray-200 p-6 rounded-lg shadow-md">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-center">
                 {/* Categories Dropdown */}
-                <div>
+                <div className="lg:col-span-2">
                     <label className="block text-gray-700 font-semibold mb-2">Categoría</label>
                     <select
                         value={category}
-                        onChange={(e) => setCategory(e.target.value)}
+                        onChange={handleChange(setCategory)}
                         className="w-full p-2 border rounded-lg text-gray-700"
                     >
-                        <option value="">Todas las categorías</option>
-                        {uniqueFilters.categories?.map((cat, idx) => (
-                            <option key={idx} value={cat}>
-                                {cat}
-                            </option>
-                        ))}
+                        <option value="">Todas</option>
+                        {generateOptions(uniqueFilters.categories)}
                     </select>
                 </div>
 
                 {/* Search Input */}
-                <div>
+                <div className="lg:col-span-5">
                     <label className="block text-gray-700 font-semibold mb-2">Buscar</label>
                     <input
                         type="text"
                         value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
+                        onChange={handleChange(setSearchTerm)}
                         placeholder="Buscar por título o descripción..."
                         className="w-full p-2 border rounded-lg text-gray-700"
                     />
                 </div>
 
                 {/* Location Filters */}
-                <div>
+                <div className="lg:col-span-5">
                     <label className="block text-gray-700 font-semibold mb-2">Ubicación</label>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                    <div className="grid grid-cols-3 gap-2">
                         <select
                             value={departamento}
-                            onChange={handleDepartamentoChange}
+                            onChange={handleChange(setDepartamento, [setProvincia, setDistrito])}
                             className="p-2 border rounded-lg text-gray-700"
                         >
                             <option value="">Departamento</option>
-                            {uniqueFilters.departamentos?.map((dep, idx) => (
-                                <option key={idx} value={dep}>
-                                    {dep}
-                                </option>
-                            ))}
+                            {generateOptions(uniqueFilters.departamentos)}
                         </select>
                         <select
                             value={provincia}
-                            onChange={handleProvinciaChange}
+                            onChange={handleChange(setProvincia, [setDistrito])}
                             className="p-2 border rounded-lg text-gray-700"
                             disabled={!departamento}
                         >
                             <option value="">Provincia</option>
-                            {uniqueFilters.provincias?.map((prov, idx) => (
-                                <option key={idx} value={prov}>
-                                    {prov}
-                                </option>
-                            ))}
+                            {generateOptions(uniqueFilters.provincias)}
                         </select>
                         <select
                             value={distrito}
-                            onChange={(e) => setDistrito(e.target.value)}
+                            onChange={handleChange(setDistrito)}
                             className="p-2 border rounded-lg text-gray-700"
                             disabled={!provincia}
                         >
                             <option value="">Distrito</option>
-                            {uniqueFilters.distritos?.map((dis, idx) => (
-                                <option key={idx} value={dis}>
-                                    {dis}
-                                </option>
-                            ))}
+                            {generateOptions(uniqueFilters.distritos)}
                         </select>
                     </div>
                 </div>
             </div>
-
         </div>
     );
 };

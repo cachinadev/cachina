@@ -77,19 +77,22 @@ const Login = () => {
       {success && <p className="text-green-500 text-center mb-4">{success}</p>}
 
       <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <label className="block text-gray-700 font-semibold">Número de Teléfono</label>
-          <input
-            type="text"
-            name="phoneNumber"
-            value={formData.phoneNumber}
-            onChange={handleChange}
-            maxLength="9"
-            placeholder="Ingrese su número de 9 dígitos"
-            className="w-full border border-gray-300 rounded-md p-3 focus:ring-2 focus:ring-blue-500"
-            required
-          />
-        </div>
+      <div>
+  <label className="block text-gray-700 font-semibold">Número de Teléfono</label>
+  <input
+    type="tel"
+    name="phoneNumber"
+    value={formData.phoneNumber}
+    onChange={handleChange}
+    onInput={(e) => {
+      e.target.value = e.target.value.replace(/\D/g, ""); // Remove non-numeric characters
+    }}
+    maxLength="9"
+    placeholder="Ingrese su número de 9 dígitos"
+    className="w-full border border-gray-300 rounded-md p-3 focus:ring-2 focus:ring-blue-500"
+    required
+  />
+</div>
         <div>
           <label className="block text-gray-700 font-semibold">Contraseña</label>
           <input

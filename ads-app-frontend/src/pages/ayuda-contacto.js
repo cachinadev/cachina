@@ -5,7 +5,7 @@ const AyudaContacto = () => {
     return (
         <div className="max-w-4xl mx-auto p-6 bg-white shadow-lg rounded-lg">
             {/* 🔹 Header */}
-            <div className="bg-blue-600 text-white p-5 rounded-t-lg text-center">
+            <div className="bg-red-600 text-white p-5 rounded-t-lg text-center">
                 <h1 className="text-3xl font-bold">📞 Ayuda y Contacto</h1>
                 <p className="text-sm mt-1">¿Tienes preguntas? Estamos aquí para ayudarte.</p>
             </div>

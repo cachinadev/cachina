@@ -220,8 +220,22 @@ const shareAd = () => {
               <h1 className="text-4xl font-extrabold tracking-tight leading-tight mb-1">{ad.title}</h1>
               <p className="text-lg font-medium opacity-90">{ad.category} • {ad.departamento}, {ad.provincia}, {ad.distrito}</p>
               <div className="flex items-center space-x-4 mt-2 text-sm opacity-80">
-                <p>Creado por: <span className="font-semibold">{ad.createdBy?.name || "Unknown"}</span></p>
-                <p className="flex items-center"><FaEye className="mr-1" /> {ad.views} Vistos</p>
+                
+            {/* <p>Creado por: <span className="font-semibold">{ad.createdBy?.name || "Unknown"}</span></p> */}
+
+            <p>
+
+            Creado por:{" "}
+            <a
+                href={`/user/${encodeURIComponent(ad.createdBy?.name.replace(/\s+/g, "").toLowerCase())}`}
+                className="font-bold text-white-500 hover:underline"
+            >
+                {ad.createdBy?.name || "Desconocido"}
+            </a>
+            </p>
+
+
+            <p className="flex items-center"><FaEye className="mr-1" /> {ad.views} Vistos</p>
               </div>
             </div>
       

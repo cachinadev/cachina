@@ -35,13 +35,6 @@ const Nosotros = () => {
                     <li><strong>🌍 Accesibilidad:</strong> Una plataforma inclusiva para todos.</li>
                     <li><strong>🔒 Confianza:</strong> Seguridad y transparencia en cada transacción.</li>
                 </ul>
-
-                {/* 🔹 Contact Information */}
-                <h2 className="text-2xl font-semibold mt-8 mb-4">Contáctanos</h2>
-                <p>
-                    Escríbenos a 
-                    <a href="mailto:cachinapuntope@gmail.com" className="text-blue-500 font-semibold underline"> cachinapuntope@gmail.com</a> o llámanos al <strong>+51 986 035 075</strong>.
-                </p>
             </div>
         </div>
     );

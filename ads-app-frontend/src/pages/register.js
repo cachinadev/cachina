@@ -163,18 +163,25 @@ const Registration = () => {
           </div>
         )}
 
-        {/* Número de Teléfono */}
-        <div>
-          <label className="block text-gray-700">Teléfono</label>
-          <input
-            type="text"
-            name="phone"
-            value={formData.phone}
-            onChange={handleChange}
-            maxLength={9}
-            className="w-full border-gray-300 rounded-md p-2"
-          />
-        </div>
+{/* Número de Teléfono */}
+<div>
+  <label className="block text-gray-700">Teléfono</label>
+  <input
+    type="text"
+    name="phone"
+    value={formData.phone}
+    onChange={(e) => {
+      const onlyNumbers = e.target.value.replace(/\D/g, ""); // Remove non-numeric characters
+      if (onlyNumbers.length <= 9) {
+        handleChange({ target: { name: "phone", value: onlyNumbers } });
+      }
+    }}
+    maxLength={9}
+    className="w-full border-gray-300 rounded-md p-2"
+    inputMode="numeric"
+    pattern="[0-9]*"
+  />
+</div>
 
         {/* Contraseña */}
         <div>

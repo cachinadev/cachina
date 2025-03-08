@@ -27,7 +27,7 @@ function MyApp({ Component, pageProps }) {
   return (
     <AuthProvider> {/* ✅ Global Authentication Context */}
       <Head>
-        <title>Cachina - Compra, Vende y Alquila Fácilmente</title>
+        <title>Cachina Pe - Ofrece, Vende, Compra y Alquila Fácilmente</title>
         <meta name="description" content="Encuentra y publica anuncios con facilidad en Cachina." />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <meta charSet="UTF-8" />
@@ -36,7 +36,7 @@ function MyApp({ Component, pageProps }) {
         <meta property="og:image" content="/images/og-image.jpg" />
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://cachina.pe" />
-        <link rel="icon" href="/favicon.ico" />
+        <link rel="icon" href="/images/cachina_logo.png" />
       </Head>
       <Layout>
         <Component {...pageProps} />
