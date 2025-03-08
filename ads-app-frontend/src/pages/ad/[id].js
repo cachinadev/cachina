@@ -274,7 +274,8 @@ const shareAd = () => {
             {ad.pictures.map((pic, index) => (
                 <div key={index} className="w-full flex justify-center">
                     <img 
-                        src={pic ? `http://localhost:5000${pic}` : "/images/placeholder.png"} 
+                        src={pic ? `${process.env.NEXT_PUBLIC_API_BASE_URL}${pic}` : "/images/placeholder.png"} 
+
                         alt={`Ad Image ${index + 1}`} 
                         className="w-full h-auto max-h-96 object-contain rounded-lg"
                         onError={(e) => (e.target.src = "/images/placeholder.png")}

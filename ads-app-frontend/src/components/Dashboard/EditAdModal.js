@@ -126,7 +126,7 @@ const EditAdModal = ({ ad, isOpen, onClose, onAdUpdated }) => {
               {formData.pictures.map((pic, index) => (
                 <div key={index} className="relative">
                   <img
-                    src={`http://localhost:5000${pic}`}
+                   src={`${process.env.NEXT_PUBLIC_API_BASE_URL}${pic}`}
                     alt={`Imagen ${index + 1}`}
                     className="w-full h-32 object-cover rounded-md shadow-md"
                   />

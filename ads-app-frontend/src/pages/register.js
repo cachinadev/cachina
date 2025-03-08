@@ -78,9 +78,9 @@ const Registration = () => {
       };
 
       const response = await axios.post(
-        "http://localhost:5000/api/users/register",
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/users/register`,
         payload
-      );
+    );    
 
       const { token, user, message } = response.data;
 

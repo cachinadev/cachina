@@ -57,6 +57,8 @@ app.use((err, req, res, next) => {
 
 // 🚀 Start Server
 const PORT = process.env.PORT || 5000;
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || `http://localhost:${PORT}/api`;
+
 app.listen(PORT, "0.0.0.0", () => {
-    console.log(`Server is running on: http://localhost:${PORT}`);
+    console.log(`✅ Server is running on: ${API_BASE_URL}`);
 });

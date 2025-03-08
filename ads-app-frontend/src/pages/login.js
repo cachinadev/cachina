@@ -53,8 +53,11 @@ const Login = () => {
     setSuccess("");
 
     try {
-      const response = await axios.post("http://localhost:5000/api/users/login", formData);
-      const { token, user } = response.data;
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/users/login`,
+        formData
+    );
+          const { token, user } = response.data;
 
       // ✅ Update global auth state
       login(user, token);

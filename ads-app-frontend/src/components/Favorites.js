@@ -56,7 +56,7 @@ const Favorites = () => {
                     >
                         {/* Ad Image */}
                         <img
-                            src={`http://localhost:5000${ad.pictures[0]}`}
+                            src={`${process.env.NEXT_PUBLIC_API_BASE_URL}${ad.pictures[0]}`}    
                             alt={ad.title}
                             className="w-full h-48 object-cover rounded-md mb-2 cursor-pointer"
                             onClick={() => handleAdClick(ad._id)}

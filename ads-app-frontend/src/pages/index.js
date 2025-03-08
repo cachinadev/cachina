@@ -100,8 +100,8 @@ const LandingPage = () => {
                         >
                             {ad.pictures?.length > 0 ? (
                                 <img
-                                    src={`http://localhost:5000${ad.pictures[0]}`}
-                                    alt={ad.title}
+                                src={`${process.env.NEXT_PUBLIC_API_BASE_URL}${ad.pictures[0]}`}
+                                alt={ad.title}
                                     className="w-full h-56 object-cover transition-transform duration-300 group-hover:scale-105"
                                 />
                             ) : (

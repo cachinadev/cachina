@@ -80,7 +80,7 @@ const AllAds = ({ ads, setAds, fetchUserDetails, fetchUserAds = null }) => {
             >
               {ad.pictures && ad.pictures.length > 0 && (
                 <img
-                  src={`http://localhost:5000${ad.pictures[0]}`}
+                  src={`${process.env.NEXT_PUBLIC_API_BASE_URL}${ad.pictures[0]}`}
                   alt={ad.title}
                   className="w-full h-40 object-cover rounded-md"
                 />

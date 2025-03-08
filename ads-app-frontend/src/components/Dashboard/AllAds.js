@@ -83,7 +83,7 @@ const AllAds = ({ ads, setAds, fetchUserDetails, fetchUserAds }) => {
                             {ad.pictures?.length > 0 && (
                                 <a href={`/ad/${ad._id}`} className="block">
                                     <img
-                                        src={`http://localhost:5000${ad.pictures[0]}`}
+                                        src={`${process.env.NEXT_PUBLIC_API_BASE_URL}${ad.pictures[0]}`}
                                         alt={ad.title}
                                         className="w-full h-40 object-cover rounded-md hover:opacity-90 transition-opacity"
                                     />
