@@ -3,7 +3,9 @@ import React from "react";
 const BuscoFields = () => {
     return (
         <div className="bg-gray-100 p-4 rounded-md mt-4">
-            <h2 className="text-lg font-semibold text-gray-700">📌 Sugerencias para tu anuncio de "Busco"</h2>
+            <h2 className="text-lg font-semibold text-gray-700">
+                📌 Sugerencias para tu anuncio de &quot;Busco&quot;
+            </h2>
             <p className="text-gray-700 mt-2">
                 Si buscas algún producto o servicio, incluye en tu anuncio:
             </p>

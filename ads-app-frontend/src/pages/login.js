@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
+import Link from "next/link";
 import { useAuth } from "../context/AuthContext"; // ✅ Use Auth Context
 import axios from "axios";
 
@@ -28,15 +29,15 @@ const Login = () => {
   // ✅ Validate form fields
   const validateForm = () => {
     if (!formData.phoneNumber || !formData.password) {
-      setError("Por favor, complete todos los campos.");
+      setError("⚠️ Por favor, complete todos los campos.");
       return false;
     }
     if (!/^\d{9}$/.test(formData.phoneNumber)) {
-      setError("El número de teléfono debe tener exactamente 9 dígitos.");
+      setError("⚠️ El número de teléfono debe tener exactamente 9 dígitos.");
       return false;
     }
     if (formData.password.length < 6) {
-      setError("La contraseña debe tener al menos 6 caracteres.");
+      setError("⚠️ La contraseña debe tener al menos 6 caracteres.");
       return false;
     }
     setError("");
@@ -56,16 +57,16 @@ const Login = () => {
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/users/login`,
         formData
-    );
-          const { token, user } = response.data;
+      );
+      const { token, user } = response.data;
 
       // ✅ Update global auth state
       login(user, token);
 
-      setSuccess("¡Inicio de sesión exitoso! Redirigiendo...");
+      setSuccess("✅ ¡Inicio de sesión exitoso! Redirigiendo...");
       setTimeout(() => router.push("/dashboard"), 500);
     } catch (err) {
-      setError(err.response?.data?.message || "Error al iniciar sesión. Inténtelo de nuevo.");
+      setError(err.response?.data?.message || "❌ Error al iniciar sesión. Inténtelo de nuevo.");
       console.error("Error de inicio de sesión:", err.response?.data || err.message);
     } finally {
       setLoading(false);
@@ -74,28 +75,35 @@ const Login = () => {
 
   return (
     <div className="max-w-md mx-auto mt-10 p-6 border rounded-lg shadow-lg bg-white">
-      <h1 className="text-3xl font-bold text-center text-gray-800 mb-6">Iniciar Sesión</h1>
+      <h1 className="text-3xl font-bold text-center text-gray-800 mb-6">🔑 Iniciar Sesión</h1>
 
+      {/* 🔴 Error Message */}
       {error && <p className="text-red-500 text-center mb-4">{error}</p>}
+
+      {/* ✅ Success Message */}
       {success && <p className="text-green-500 text-center mb-4">{success}</p>}
 
+      {/* 📝 Login Form */}
       <form onSubmit={handleSubmit} className="space-y-4">
-      <div>
-  <label className="block text-gray-700 font-semibold">Número de Teléfono</label>
-  <input
-    type="tel"
-    name="phoneNumber"
-    value={formData.phoneNumber}
-    onChange={handleChange}
-    onInput={(e) => {
-      e.target.value = e.target.value.replace(/\D/g, ""); // Remove non-numeric characters
-    }}
-    maxLength="9"
-    placeholder="Ingrese su número de 9 dígitos"
-    className="w-full border border-gray-300 rounded-md p-3 focus:ring-2 focus:ring-blue-500"
-    required
-  />
-</div>
+        {/* 📞 Phone Number Input */}
+        <div>
+          <label className="block text-gray-700 font-semibold">Número de Teléfono</label>
+          <input
+            type="tel"
+            name="phoneNumber"
+            value={formData.phoneNumber}
+            onChange={handleChange}
+            onInput={(e) => {
+              e.target.value = e.target.value.replace(/\D/g, ""); // Remove non-numeric characters
+            }}
+            maxLength="9"
+            placeholder="Ingrese su número de 9 dígitos"
+            className="w-full border border-gray-300 rounded-md p-3 focus:ring-2 focus:ring-blue-500"
+            required
+          />
+        </div>
+
+        {/* 🔑 Password Input */}
         <div>
           <label className="block text-gray-700 font-semibold">Contraseña</label>
           <input
@@ -109,6 +117,7 @@ const Login = () => {
           />
         </div>
 
+        {/* 🔘 Submit Button */}
         <button
           type="submit"
           className={`w-full bg-blue-500 text-white px-4 py-3 rounded-md font-semibold transition duration-200 ${
@@ -116,15 +125,16 @@ const Login = () => {
           }`}
           disabled={loading}
         >
-          {loading ? "Iniciando sesión..." : "Iniciar Sesión"}
+          {loading ? "⏳ Iniciando sesión..." : "🚀 Iniciar Sesión"}
         </button>
       </form>
 
+      {/* 📌 Register Link (Fixed for Next.js) */}
       <p className="text-center text-gray-500 mt-4">
         ¿No tienes una cuenta?{" "}
-        <a href="/register" className="text-blue-500 hover:underline">
+        <Link href="/register" className="text-blue-500 hover:underline">
           Regístrate aquí
-        </a>
+        </Link>
       </p>
     </div>
   );

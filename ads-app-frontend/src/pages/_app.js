@@ -1,6 +1,5 @@
 import { useEffect } from "react";
 import Head from "next/head";
-import dynamic from "next/dynamic";
 import Layout from "../components/Layout";
 import { AuthProvider } from "../context/AuthContext"; // ✅ Ensure AuthProvider wraps the app
 import "../styles/globals.css";

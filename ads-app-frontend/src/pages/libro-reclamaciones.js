@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import Link from "next/link";
 import { submitComplaint } from "../services/api";
 
 const LibroReclamaciones = () => {
@@ -46,13 +47,13 @@ const LibroReclamaciones = () => {
         e.preventDefault();
         try {
             const response = await submitComplaint(formData);
-            setSubmittedComplaintId(response.complaintId); // ✅ Store and display submitted complaint ID
+            setSubmittedComplaintId(response.complaintId);
             setSuccessMessage(response.message);
             setErrorMessage(null);
 
             // Reset form after submission (except complaint ID)
             setFormData({
-                complaintId: formData.complaintId, // Keep the same complaint ID
+                complaintId: formData.complaintId,
                 name: "",
                 lastName: "",
                 email: "",
@@ -74,7 +75,7 @@ const LibroReclamaciones = () => {
 
     return (
         <div className="max-w-3xl mx-auto p-6 bg-white shadow-md rounded-lg">
-            {/* ✅ Header with Company Info */}
+            {/* ✅ Header */}
             <div className="bg-blue-600 text-white p-4 rounded-t-lg text-center">
                 <h1 className="text-2xl font-bold">📜 Libro de Reclamaciones</h1>
                 <p className="text-sm">CACHINA PE E.I.R.L. | RUC: 20613204106</p>
@@ -93,7 +94,9 @@ const LibroReclamaciones = () => {
             <form onSubmit={handleSubmit} className="mt-4">
                 {/* Complaint ID Display */}
                 <div className="text-center mb-4">
-                    <p className="text-gray-500 text-sm">ID de Reclamo: <strong>{formData.complaintId}</strong></p>
+                    <p className="text-gray-500 text-sm">
+                        ID de Reclamo: <strong>{formData.complaintId}</strong>
+                    </p>
                 </div>
 
                 {/* 🔹 Consumer Identification */}
@@ -125,20 +128,21 @@ const LibroReclamaciones = () => {
 
                 {/* 🔹 Complaint Details */}
                 <h2 className="text-lg font-semibold mt-6 mb-2">3️⃣ Detalle de la Reclamación</h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <select name="complaintType" value={formData.complaintType} onChange={handleChange} className="border p-2 rounded" required>
-                        <option value="">Tipo de reclamo*</option>
-                        <option value="Reclamo">Reclamo</option>
-                        <option value="Queja">Queja</option>
-                    </select>
-                </div>
+                <select name="complaintType" value={formData.complaintType} onChange={handleChange} className="border p-2 rounded w-full" required>
+                    <option value="">Tipo de reclamo*</option>
+                    <option value="Reclamo">Reclamo</option>
+                    <option value="Queja">Queja</option>
+                </select>
                 <textarea name="details" value={formData.details} onChange={handleChange} placeholder="Detalle del reclamo o queja*" rows="4" className="border p-2 rounded w-full mt-4" required></textarea>
 
                 {/* 🔹 Privacy Policy Checkbox */}
                 <div className="mt-4 flex items-center">
                     <input type="checkbox" name="acceptedPrivacyPolicy" checked={formData.acceptedPrivacyPolicy} onChange={handleChange} className="mr-2" required />
                     <label className="text-sm">
-                        Acepto la <a href="/politica-de-privacidad" className="text-blue-500 underline">Política de Privacidad</a>
+                        Acepto la{" "}
+                        <Link href="/politica-de-privacidad" className="text-blue-500 underline">
+                            Política de Privacidad
+                        </Link>
                     </label>
                 </div>
 

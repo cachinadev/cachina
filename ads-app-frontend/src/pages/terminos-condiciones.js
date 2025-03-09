@@ -1,4 +1,5 @@
 import React from "react";
+import Link from "next/link";
 
 const TerminosCondiciones = () => {
   return (
@@ -12,14 +13,14 @@ const TerminosCondiciones = () => {
       {/* ✅ Introduction */}
       <div className="mt-6">
         <p className="text-gray-600">
-          Bienvenido a <strong>Cachina.pe</strong>. Al utilizar nuestro sitio web y nuestros servicios, aceptas cumplir estos Términos y Condiciones. Si no estás de acuerdo, por favor, no utilices nuestra plataforma.
+          Bienvenido a <strong>Cachina.pe</strong>. Al utilizar nuestro sitio web y servicios, aceptas estos Términos y Condiciones. Si no estás de acuerdo, por favor, no utilices nuestra plataforma.
         </p>
       </div>
 
       {/* ✅ 1️⃣ Uso del Sitio */}
       <h2 className="text-lg font-semibold mt-6">1. Uso del Sitio</h2>
       <p className="text-gray-600">
-        Cachina.pe es una plataforma de publicación de anuncios. Los usuarios deben garantizar que la información publicada es veraz y cumplir con las normativas aplicables. No se permite contenido ilegal, ofensivo o fraudulento.
+        Cachina.pe es una plataforma de anuncios. Los usuarios deben garantizar que la información publicada sea veraz y cumpla con las normativas. No se permite contenido ilegal, ofensivo o fraudulento.
       </p>
 
       {/* ✅ 2️⃣ Responsabilidad del Usuario */}
@@ -39,7 +40,11 @@ const TerminosCondiciones = () => {
       {/* ✅ 4️⃣ Privacidad y Protección de Datos */}
       <h2 className="text-lg font-semibold mt-6">4. Privacidad y Protección de Datos</h2>
       <p className="text-gray-600">
-        Al utilizar nuestros servicios, aceptas nuestra <a href="/politica-de-privacidad" className="text-blue-500 underline">Política de Privacidad</a>. Nos comprometemos a proteger tu información y cumplir con la Ley N.° 29733 de Protección de Datos Personales en Perú.
+        Al utilizar nuestros servicios, aceptas nuestra{" "}
+        <Link href="/politica-de-privacidad" className="text-blue-500 underline">
+          Política de Privacidad
+        </Link>
+        . Nos comprometemos a proteger tu información y cumplir con la Ley N.° 29733 de Protección de Datos Personales en Perú.
       </p>
 
       {/* ✅ 5️⃣ Terminación de la Cuenta */}
@@ -66,7 +71,12 @@ const TerminosCondiciones = () => {
         Si tienes preguntas sobre estos términos, contáctanos a través de:
       </p>
       <ul className="list-disc ml-6 text-gray-600">
-        <li>📧 <a href="mailto:cachinapuntope@gmail.com" className="text-blue-500 underline">cachinapuntope@gmail.com</a></li>
+        <li>
+          📧{" "}
+          <a href="mailto:cachinapuntope@gmail.com" className="text-blue-500 underline">
+            cachinapuntope@gmail.com
+          </a>
+        </li>
         <li>📞 Teléfono: +51 986 035 075</li>
       </ul>
 

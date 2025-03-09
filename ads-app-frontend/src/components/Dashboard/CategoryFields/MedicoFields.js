@@ -3,7 +3,9 @@ import React from "react";
 const MedicoFields = () => {
     return (
         <div className="p-4 border rounded bg-gray-50">
-            <h2 className="text-lg font-semibold text-blue-700">📌 Sugerencias para publicar un anuncio en la categoría "Médico"</h2>
+            <h2 className="text-lg font-semibold text-blue-700">
+                📌 Sugerencias para publicar un anuncio en la categoría &quot;Médico&quot;
+            </h2>
             <p className="text-gray-700 mt-2">
                 Al publicar un anuncio en la categoría de <strong>Médico</strong>, es recomendable incluir información detallada para atraer pacientes y clientes. Aquí algunas sugerencias:
             </p>

@@ -2,7 +2,6 @@ import dynamic from "next/dynamic";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import Slider from "react-slick";
-import { formatDistanceToNow, parseISO } from "date-fns";
 import "leaflet/dist/leaflet.css";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
@@ -194,21 +193,7 @@ const shareAd = () => {
         prevArrow: <CustomPrevArrow />,
         nextArrow: <CustomNextArrow />,
     };
-
-    const handleReviewSubmit = async (e) => {
-        e.preventDefault();
-        try {
-            const { data } = await API.post(`/ads/${id}/reviews`, newReview);
-            
-            // Add the new review directly to the reviews state
-            setReviews((prevReviews) => [data, ...prevReviews]);
-    
-            setNewReview({ rating: 5, comment: "" }); // Clear form
-        } catch (error) {
-            console.error("Error submitting review:", error);
-            alert("No se pudo enviar la reseña");
-        }
-    };
+//// review 
     
     return (
         <div className="container mx-auto px-4 py-8">

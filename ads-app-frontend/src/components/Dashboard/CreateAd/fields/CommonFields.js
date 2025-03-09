@@ -1,7 +1,7 @@
 import React from "react";
 import RenderLocationFields from "../RenderLocationFields";
 
-const CommonFields = ({ formData, handleChange, handleFileChange }) => (
+const CommonFields = ({ formData, handleChange }) => (
     <>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>

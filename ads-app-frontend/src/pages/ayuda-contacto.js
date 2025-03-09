@@ -1,4 +1,5 @@
 import React from "react";
+import Link from "next/link";
 import { FaPhone, FaEnvelope, FaMapMarkerAlt, FaClock, FaQuestionCircle } from "react-icons/fa";
 
 const AyudaContacto = () => {
@@ -35,19 +36,29 @@ const AyudaContacto = () => {
                         <h3 className="text-lg font-semibold flex items-center gap-2">
                             <FaQuestionCircle className="text-blue-500" /> ¿Cómo publico un anuncio?
                         </h3>
-                        <p className="text-gray-600">Debes registrarte en nuestra plataforma y dirigirte a la sección de "Crear Anuncio" en el dashboard.</p>
+                        <p className="text-gray-600">
+                            Debes registrarte en nuestra plataforma y dirigirte a la sección de{" "}
+                            <strong>&quot;Crear Anuncio&quot;</strong> en el dashboard.
+                        </p>
                     </div>
                     <div className="border-l-4 border-blue-500 pl-3">
                         <h3 className="text-lg font-semibold flex items-center gap-2">
                             <FaQuestionCircle className="text-blue-500" /> ¿Cómo contacto a un vendedor?
                         </h3>
-                        <p className="text-gray-600">Cada anuncio tiene una opción para contactar al vendedor por teléfono o correo electrónico.</p>
+                        <p className="text-gray-600">
+                            Cada anuncio tiene una opción para contactar al vendedor por teléfono o correo electrónico.
+                        </p>
                     </div>
                     <div className="border-l-4 border-blue-500 pl-3">
                         <h3 className="text-lg font-semibold flex items-center gap-2">
                             <FaQuestionCircle className="text-blue-500" /> ¿Cómo reporto un problema?
                         </h3>
-                        <p className="text-gray-600">Puedes escribirnos a nuestro correo electrónico o llenar un formulario en la sección de <a href="/libro-reclamaciones" className="text-blue-500 underline">Libro de Reclamaciones</a>.</p>
+                        <p className="text-gray-600">
+                            Puedes escribirnos a nuestro correo electrónico o llenar un formulario en la sección de{" "}
+                            <Link href="/libro-reclamaciones" className="text-blue-500 underline">
+                                Libro de Reclamaciones
+                            </Link>.
+                        </p>
                     </div>
                 </div>
             </div>

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 const categoryFileMap = {
-    
+
     // 🏠 Bienes Raíces y Alquiler
     "Inmobiliaria": "InmobiliariaFields",
     "Constructora": "ConstructoraFields",
@@ -179,7 +179,7 @@ const CategoryFields = ({ category, formData, handleChange, handleCheckboxChange
     const [FieldsComponent, setFieldsComponent] = useState(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
-    const componentCache = {}; // Cache imported components
+    const [componentCache] = useState({}); // ✅ Fixed missing dependency
 
     useEffect(() => {
         if (category) {
@@ -190,7 +190,7 @@ const CategoryFields = ({ category, formData, handleChange, handleCheckboxChange
                 const filename = categoryFileMap[category];
 
                 if (!filename) {
-                    setError(`No fields available for: "${category}"`);
+                    setError(`No fields available for: &quot;${category}&quot;`);
                     setFieldsComponent(null);
                     setLoading(false);
                     return;
@@ -209,7 +209,8 @@ const CategoryFields = ({ category, formData, handleChange, handleCheckboxChange
                     setFieldsComponent(() => Component.default);
                 } catch (err) {
                     console.error(`Failed to load fields for category: ${category}`, err);
-                    setError(`Could not load fields for category: ${category}.`);
+                    setError(`Could not load fields for category: &quot;${category}&quot;.`);
+
                     setFieldsComponent(null);
                 } finally {
                     setLoading(false);
@@ -227,7 +228,7 @@ const CategoryFields = ({ category, formData, handleChange, handleCheckboxChange
     }
 
     if (loading) {
-        return <p className="text-gray-500">Loading fields for "{category}"...</p>;
+        return <p className="text-gray-500">Cargando campos para &quot;{category}&quot;...</p>;
     }
 
     if (error) {
@@ -242,8 +243,8 @@ const CategoryFields = ({ category, formData, handleChange, handleCheckboxChange
     if (!FieldsComponent) {
         return (
             <p className="text-gray-500">
-                No additional fields are available for "{category}". Please try another category.
-            </p>
+                No hay campos adicionales disponibles para &quot;{category}&quot;. Pruebe otra categoría.
+                </p>
         );
     }
 

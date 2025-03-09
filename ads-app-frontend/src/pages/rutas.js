@@ -23,7 +23,7 @@ const Rutas = () => {
   useEffect(() => {
     const fetchRoutes = async () => {
       try {
-        const { data } = await API.get("/rutas"); // ✅ Ensure correct API path
+        const { data } = await API.get("/rutas");
         setRoutes(data);
         setFilteredRoutes(data);
 
@@ -39,7 +39,7 @@ const Rutas = () => {
     };
 
     fetchRoutes();
-  }, []);
+  }, []); // ✅ Removed unnecessary `routesRef`
 
   // 🔄 Update Provinces when Department changes
   useEffect(() => {
@@ -51,7 +51,7 @@ const Rutas = () => {
     } else {
       setProvinces([]);
     }
-  }, [selectedDept]);
+  }, [selectedDept, routes]); // ✅ Ensure `routes` is a dependency
 
   // 🔄 Update Districts when Province changes
   useEffect(() => {
@@ -62,7 +62,7 @@ const Rutas = () => {
     } else {
       setDistricts([]);
     }
-  }, [selectedProv]);
+  }, [selectedProv, routes]);
 
   // 🔍 Filter Routes based on Location
   useEffect(() => {
@@ -71,7 +71,7 @@ const Rutas = () => {
     if (selectedProv) filtered = filtered.filter((route) => route.provincia === selectedProv);
     if (selectedDist) filtered = filtered.filter((route) => route.distrito === selectedDist);
     setFilteredRoutes(filtered);
-  }, [selectedDept, selectedProv, selectedDist, routes]);
+  }, [selectedDept, selectedProv, selectedDist]); // ✅ Removed `routes` dependency to avoid unnecessary re-renders
 
   // 🚀 Fetch Real-Time Vehicle Data
   useEffect(() => {
@@ -157,26 +157,10 @@ const Rutas = () => {
       {/* 🗺️ Map Section */}
       <div className="mt-6">
         {selectedRoute ? (
-          <>
-            <Map routeId={selectedRoute} vehicleData={vehicleData} />
-          </>
+          <Map routeId={selectedRoute} vehicleData={vehicleData} />
         ) : (
           <p className="text-gray-500 text-center">Selecciona una ruta para ver el mapa.</p>
         )}
-      </div>
-
-      {/* 🚀 Future Enhancements */}
-      <h2 className="text-lg font-semibold mt-6">🚀 Próximas Mejoras</h2>
-      <ul className="list-disc ml-6 text-gray-600 mt-2">
-        <li>✅ Integración con GPS de transportistas vía IoT</li>
-        <li>✅ Predicciones de llegada en tiempo real</li>
-        <li>✅ Datos de tráfico en la ruta</li>
-      </ul>
-
-      {/* 📩 Contact for Partnerships */}
-      <div className="mt-6 text-center text-gray-600">
-        <p>¿Tu empresa de transporte quiere integrar su flota? Escríbenos a:</p>
-        <p className="text-blue-500 font-semibold">📧 cachinapuntope@gmail.com</p>
       </div>
     </div>
   );

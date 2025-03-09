@@ -1,15 +1,14 @@
 import React, { useState, useEffect } from "react";
-import { useRouter } from "next/router"; // Import Next.js router for navigation
 import API from "../../services/api";
 import EditAdModal from "./EditAdModal";
 import { FaEdit, FaTrash, FaPlus, FaEye } from "react-icons/fa";
+import Image from "next/image"; // ✅ Use Next.js optimized Image component
 
 const AllAds = ({ ads, setAds, fetchUserDetails, fetchUserAds }) => {
     const [selectedAd, setSelectedAd] = useState(null);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
-    const router = useRouter(); // Initialize router
 
     useEffect(() => {
         if (ads.length === 0 && typeof fetchUserAds === "function") {
@@ -79,12 +78,14 @@ const AllAds = ({ ads, setAds, fetchUserDetails, fetchUserAds }) => {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {ads.map((ad) => (
                         <div key={ad._id} className="bg-gray-100 p-4 rounded-lg shadow hover:shadow-lg transition">
-                            {/* 📌 Ad Image */}
+                            {/* ✅ Next.js Optimized Image */}
                             {ad.pictures?.length > 0 && (
                                 <a href={`/ad/${ad._id}`} className="block">
-                                    <img
+                                    <Image
                                         src={`${process.env.NEXT_PUBLIC_API_BASE_URL}${ad.pictures[0]}`}
                                         alt={ad.title}
+                                        width={300} // Adjust dimensions as needed
+                                        height={200}
                                         className="w-full h-40 object-cover rounded-md hover:opacity-90 transition-opacity"
                                     />
                                 </a>

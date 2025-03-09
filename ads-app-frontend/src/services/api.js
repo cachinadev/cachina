@@ -249,7 +249,7 @@ export const UserAPI = {
 export const submitComplaint = async (complaintData) => {
     try {
         const filteredData = Object.fromEntries(
-            Object.entries(complaintData).filter(([_, value]) => value !== "")
+            Object.entries(complaintData).filter(([value]) => value !== "") //_,
         );
 
         const { data } = await API.post("/complaints/submit", {

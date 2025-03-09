@@ -13,7 +13,8 @@ const ReviewComponent = ({ adId, user }) => {
         try {
             const { data } = await API.get(`/ads/${adId}/reviews`);
             setReviews(data);
-        } catch (err) {
+        } catch (error) {
+            console.error("Error fetching reviews:", error);
             setError("❌ No se pudo cargar las reseñas.");
         }
     }, [adId]);
@@ -34,7 +35,8 @@ const ReviewComponent = ({ adId, user }) => {
             const { data } = await API.post(`/ads/${adId}/reviews`, newReview);
             setReviews((prevReviews) => [data, ...prevReviews]); // Add new review at the top
             setNewReview({ rating: 0, comment: "" }); // Reset input
-        } catch (err) {
+        } catch (error) {
+            console.error("Error submitting review:", error);
             setError("❌ No se pudo enviar la reseña.");
         } finally {
             setLoading(false);

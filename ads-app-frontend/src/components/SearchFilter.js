@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from "react";
+import React, { useCallback } from "react";
 
 const SearchFilter = ({
     category,
@@ -13,30 +13,21 @@ const SearchFilter = ({
     setDistrito,
     uniqueFilters
 }) => {
-    // Reset all filters
-    const handleReset = useCallback(() => {
-        setSearchTerm("");
-        setCategory("");
-        setDepartamento("");
-        setProvincia("");
-        setDistrito("");
-    }, [setSearchTerm, setCategory, setDepartamento, setProvincia, setDistrito]);
-
-    // Handle changes efficiently
+    // Handle changes efficiently with automatic resets
     const handleChange = useCallback((setter, resetters = []) => (e) => {
         setter(e.target.value);
         resetters.forEach(reset => reset(""));
     }, []);
 
-    // Memoized filter options for better performance
-    const generateOptions = useCallback((items) => (
-        items?.map((item, idx) => <option key={idx} value={item}>{item}</option>)
+    // Generate dropdown options dynamically
+    const generateOptions = useCallback((items = []) => (
+        items.map((item, idx) => <option key={idx} value={item}>{item}</option>)
     ), []);
 
     return (
         <div className="mb-8 bg-gray-200 p-6 rounded-lg shadow-md">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-center">
-                {/* Categories Dropdown */}
+                {/* 📌 Categories Dropdown */}
                 <div className="lg:col-span-2">
                     <label className="block text-gray-700 font-semibold mb-2">Categoría</label>
                     <select
@@ -49,7 +40,7 @@ const SearchFilter = ({
                     </select>
                 </div>
 
-                {/* Search Input */}
+                {/* 🔍 Search Input */}
                 <div className="lg:col-span-5">
                     <label className="block text-gray-700 font-semibold mb-2">Buscar</label>
                     <input
@@ -61,7 +52,7 @@ const SearchFilter = ({
                     />
                 </div>
 
-                {/* Location Filters */}
+                {/* 📍 Location Filters */}
                 <div className="lg:col-span-5">
                     <label className="block text-gray-700 font-semibold mb-2">Ubicación</label>
                     <div className="grid grid-cols-3 gap-2">

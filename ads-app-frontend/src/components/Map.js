@@ -1,9 +1,9 @@
 import React, { useEffect, useRef, useState } from "react";
-import { MapContainer, TileLayer, Polyline, Marker, useMap } from "react-leaflet";
+import { MapContainer, TileLayer, Polyline, useMap } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 
-// 🚗 Car Icon for simulation (Ensure `/public/car-icon.png` exists)
+// 🚗 Car Icon (Ensure `/public/car-icon.png` exists)
 const carIcon = new L.Icon({
   iconUrl: "/car-icon.png",
   iconSize: [40, 40],
@@ -12,54 +12,47 @@ const carIcon = new L.Icon({
 
 // 🔄 Custom Hook: Move Vehicles Without Re-rendering
 const useVehicleMovement = (vehicles, routePath) => {
-  const vehicleRefs = useRef({}); // Store vehicle markers
   const [vehiclePositions, setVehiclePositions] = useState({});
+  const indexMap = useRef({}); // Store indexes for each vehicle
+  let direction = useRef(1); // Movement direction
 
   useEffect(() => {
-    if (!routePath.length) return; // 🛑 No route, no movement
+    if (!routePath.length) return;
 
-    let direction = 1; // Forward movement
-    let indexMap = {}; // Store indexes for each vehicle
-
-    vehicles.forEach((vehicle) => {
-      indexMap[vehicle.id] = 0; // Start from the beginning
-    });
+    vehicles.forEach((vehicle) => (indexMap.current[vehicle.id] = 0));
 
     const moveVehicles = () => {
-      setVehiclePositions((prevPositions) => {
+      setVehiclePositions(() => {
         const newPositions = {};
 
         vehicles.forEach((vehicle) => {
-          let currentIndex = indexMap[vehicle.id];
-          let nextIndex = currentIndex + direction;
+          let currentIndex = indexMap.current[vehicle.id];
+          let nextIndex = currentIndex + direction.current;
 
           if (nextIndex >= routePath.length) {
-            direction = -1; // Reverse direction when reaching the end
+            direction.current = -1;
             nextIndex = routePath.length - 1;
           } else if (nextIndex < 0) {
-            direction = 1; // Forward direction when reaching the start
+            direction.current = 1;
             nextIndex = 0;
           }
 
-          indexMap[vehicle.id] = nextIndex;
-          newPositions[vehicle.id] = {
-            lat: routePath[nextIndex].lat,
-            lng: routePath[nextIndex].lng,
-          };
+          indexMap.current[vehicle.id] = nextIndex;
+          newPositions[vehicle.id] = routePath[nextIndex];
         });
 
         return newPositions;
       });
     };
 
-    const interval = setInterval(moveVehicles, 2000); // Move every 2 seconds
+    const interval = setInterval(moveVehicles, 2000);
     return () => clearInterval(interval);
   }, [vehicles, routePath]);
 
   return vehiclePositions;
 };
 
-// 🚗 Component: Handles Vehicle Rendering
+// 🚗 Component: Handles Vehicle Markers
 const VehicleMarkers = ({ vehicles, routePath }) => {
   const map = useMap();
   const vehiclePositions = useVehicleMovement(vehicles, routePath);
@@ -68,13 +61,10 @@ const VehicleMarkers = ({ vehicles, routePath }) => {
   useEffect(() => {
     vehicles.forEach((vehicle) => {
       const position = vehiclePositions[vehicle.id];
-
       if (position) {
         if (!vehicleRefs.current[vehicle.id]) {
-          // 🆕 Create marker if not exist
           vehicleRefs.current[vehicle.id] = L.marker([position.lat, position.lng], { icon: carIcon }).addTo(map);
         } else {
-          // 🔄 Update position smoothly
           vehicleRefs.current[vehicle.id].setLatLng([position.lat, position.lng]);
         }
       }
@@ -88,13 +78,13 @@ const VehicleMarkers = ({ vehicles, routePath }) => {
 const Map = ({ routeId, vehicleData }) => {
   const [routePath, setRoutePath] = useState([]);
 
-  // 📍 Fetch Route Path Once
+  // 📍 Fetch Route Path
   useEffect(() => {
     const fetchRoute = async () => {
       try {
-        const response = await fetch(`http://localhost:5000/api/rutas/${routeId}`);
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/rutas/${routeId}`);
         const data = await response.json();
-        setRoutePath(data.path);
+        setRoutePath(data.path || []);
       } catch (error) {
         console.error("Error fetching route data:", error);
       }

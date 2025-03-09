@@ -1,4 +1,5 @@
 import React from "react";
+import Link from "next/link";
 import Image from "next/image";
 
 const Publicitar = () => {
@@ -18,7 +19,6 @@ const Publicitar = () => {
           { label: "Un mes (4 semanas)", price: "5 Soles 🏆" },
           { label: "Un año (12 meses)", price: "50 Soles 🔥" },
           { label: "Permanente, indefinido", price: "100 Soles ♾️" }
-
         ].map((item, index) => (
           <div key={index} className="flex justify-between bg-gray-100 p-3 rounded-md shadow">
             <h2 className="text-lg font-semibold text-gray-800">{item.label}</h2>
@@ -77,12 +77,11 @@ const Publicitar = () => {
         </a>
 
         <p className="text-gray-500 text-sm mt-4">
-            ¿Ya tienes una cuenta?  
-            <a href="/login" className="text-blue-600 font-semibold hover:underline ml-1">Iniciar sesión</a> 
-            {/*<a href="/register" className="text-blue-600 font-semibold hover:underline ml-1">Registrarse</a>*/}
+          ¿Ya tienes una cuenta?  
+          <Link href="/login" className="text-blue-600 font-semibold hover:underline ml-1">
+            Iniciar sesión
+          </Link> 
         </p>
-
-
 
         <p className="text-blue-600 font-semibold text-lg mt-2">📧 cachinapuntope@gmail.com</p>
       </div>

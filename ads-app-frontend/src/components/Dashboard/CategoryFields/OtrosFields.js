@@ -3,7 +3,9 @@ import React from "react";
 const OtrosFields = () => {
     return (
         <div className="bg-gray-600 p-4 rounded-md mt-4">
-            <h2 className="text-lg font-semibold text-white">📌 Sugerencias para tu anuncio en la categoría "Otros"</h2>
+            <h2 className="text-lg font-semibold text-white">
+                📌 Sugerencias para tu anuncio en la categoría &quot;Otros&quot;
+            </h2>
             <p className="text-gray-100 mt-2">
                 Si tu anuncio no encaja en una categoría específica, te sugerimos incluir:
             </p>
