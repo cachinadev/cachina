@@ -9,6 +9,7 @@ import { useAuth } from "../../context/AuthContext";
 import API, { addToFavorites, removeFromFavorites, getFavorites } from "../../services/api";
 import { FaPhoneAlt, FaWhatsapp, FaTelegram, FaShareAlt, FaMapMarkerAlt, FaEye, FaHeart, FaRegHeart } from "react-icons/fa";
 import ReviewComponent from "../../components/ReviewComponent"; // Import ReviewComponent
+import Image from "next/image"; // ✅ Use Next.js optimized Image component
 
 
 // Dynamically import Leaflet components
@@ -245,9 +246,6 @@ const shareAd = () => {
                 {/* Left Content */}
                 <div className="lg:col-span-2">
 
-                {/* Image Carousel */}
-                {/* Image Carousel */}
-{/* Image Carousel */}
 {/* Image Carousel */}
 <div className="bg-white shadow-md rounded-lg mb-8 overflow-hidden relative">
     {ad.pictures.length > 1 ? (
@@ -258,10 +256,11 @@ const shareAd = () => {
         >
             {ad.pictures.map((pic, index) => (
                 <div key={index} className="w-full flex justify-center">
-                    <img 
+                    <Image 
                         src={pic ? `${process.env.NEXT_PUBLIC_API_BASE_URL}${pic}` : "/images/placeholder.png"} 
-
                         alt={`Ad Image ${index + 1}`} 
+                        width={600} // ✅ Add a default width
+                        height={400} // ✅ Add a default height
                         className="w-full h-auto max-h-96 object-contain rounded-lg"
                         onError={(e) => (e.target.src = "/images/placeholder.png")}
                     />
@@ -270,9 +269,11 @@ const shareAd = () => {
         </Slider>
     ) : ad.pictures.length === 1 ? (
         <div className="w-full flex justify-center">
-            <img 
-                src={ad.pictures[0] ? `http://localhost:5000${ad.pictures[0]}` : "/images/placeholder.png"} 
+            <Image 
+                src={ad.pictures[0] ? `${process.env.NEXT_PUBLIC_API_BASE_URL}${ad.pictures[0]}` : "/images/placeholder.png"} 
                 alt="Ad" 
+                width={600} // ✅ Add width
+                height={400} // ✅ Add height
                 className="w-full h-auto max-h-96 object-contain rounded-lg"
                 onError={(e) => (e.target.src = "/images/placeholder.png")}
             />
@@ -283,6 +284,7 @@ const shareAd = () => {
         </div>
     )}
 </div>
+
                    {/* 📖 Description Section */}
 <div className="bg-white p-6 shadow-lg rounded-lg mb-8 border-l-4 border-blue-500">
     <h2 className="text-3xl font-bold text-blue-700 flex items-center gap-2 mb-4">
