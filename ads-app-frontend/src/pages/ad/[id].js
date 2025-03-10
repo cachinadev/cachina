@@ -383,13 +383,6 @@ const shareAd = () => {
         </button>
 
         <button
-            onClick={openTelegram}
-            className="flex items-center justify-center gap-2 bg-blue-500 text-white text-lg font-semibold py-3 rounded-xl hover:bg-blue-600 transition duration-300 shadow-md w-full"
-        >
-            <FaTelegram className="text-xl" /> Telegram
-        </button>
-
-        <button
             onClick={shareAd}
             className="flex items-center justify-center gap-2 bg-yellow-500 text-white text-lg font-semibold py-3 rounded-xl hover:bg-yellow-600 transition duration-300 shadow-md w-full"
         >

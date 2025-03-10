@@ -190,13 +190,26 @@ const Layout = ({ children }) => {
             </Link>
           </div>
 
-          {/* 📕 Libro de Reclamaciones */}
-          <div className="md:w-1/3 flex justify-center md:justify-end">
-            <Link href="/libro-reclamaciones" className="text-gray-400 hover:text-white">
-              <span className="mb-2">Libro de Reclamaciones</span>
-            </Link>
-          </div>
-        </div>
+  {/* 📞 Contact Details */}
+  <div className="text-gray-400 md:w-1/3 text-center md:text-left">
+      <p>📞 Teléfono: <a href="tel:+51986035075" className="hover:text-white">+51 985 979 119</a></p>
+      <p>📧 Email: <a href="mailto:cachinapuntope@gmail.com" className="hover:text-white">cachinapuntope@gmail.com</a></p>
+      <p className="mt-2">CACHINA PE E.I.R.L. <br /> RUC: 20613204106</p>
+    </div>
+
+           {/* 📕 Libro de Reclamaciones - Positioned to Right */}
+           <Link href="/libro-reclamaciones" className="text-gray-400 hover:text-white flex flex-col items-center md:items-end">
+  <span className="mb-2">Libro de Reclamaciones</span>
+  <Image 
+    src="/images/libro-de-reclamaciones.jpg"
+    alt="Libro de Reclamaciones"
+    width={140}
+    height={140}
+    className="rounded-lg shadow-lg cursor-pointer"
+  />
+</Link>
+  </div>
+        
 
         <p className="text-gray-500 text-sm text-center mt-4">
           © {new Date().getFullYear()} CACHINA PE - Todos los derechos reservados.

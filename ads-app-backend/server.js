@@ -2,8 +2,6 @@ const express = require("express");
 const connectDB = require("./config/db");
 const cors = require("cors");
 const path = require("path");
-
-//
 require("dotenv").config();
 
 const app = express();
@@ -27,21 +25,19 @@ app.use("/api/users", userRoutes);
 app.use("/api/ads", adRoutes);
 app.use("/api/reviews", reviewRoutes);
 app.use("/api/complaints", complaintRoutes);
-app.use("/api/rutas", routeRoutes); // ✅ Ensure correct API path
-app.use("/api/ads", require("./routes/adRoutes"));
+app.use("/api/rutas", routeRoutes); 
 
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
-
-app.get("/api/test", (req, res) => {
-    res.send("API is working!");
-});
-
-// 📂 Serve Uploaded Files (Images, Documents, etc.)
+// ✅ Serve Uploaded Files
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // 🏥 Health Check Route
 app.get("/", (req, res) => {
     res.status(200).json({ message: "✅ API is running smoothly 🚀" });
+});
+
+// ✅ NEW: Fix `/api` Not Found Issue
+app.get("/api", (req, res) => {
+    res.json({ message: "✅ API is running!" });
 });
 
 // ❌ Handle Undefined Routes (404)
@@ -57,7 +53,7 @@ app.use((err, req, res, next) => {
 
 // 🚀 Start Server
 const PORT = process.env.PORT || 5000;
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || `http://localhost:${PORT}/api`;
+const API_BASE_URL = `http://0.0.0.0:${PORT}/api`; // ✅ Updated
 
 app.listen(PORT, "0.0.0.0", () => {
     console.log(`✅ Server is running on: ${API_BASE_URL}`);

@@ -4,7 +4,7 @@ const Ad = require("./models/ad"); // Update the path as necessary
 
 // MongoDB connection
 mongoose
-  .connect("mongodb://localhost:27017/test")
+  .connect("mongodb://localhost:27017/cachina")
   .then(() => console.log("MongoDB connected!"))
   .catch((err) => console.error("MongoDB connection error:", err));
 

@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 const Route = require("./models/routeModel");
 
 // 🌍 Connect to MongoDB
-mongoose.connect("mongodb://localhost:27017/test", {
+mongoose.connect("mongodb://localhost:27017/cachina", {
   useNewUrlParser: true,
   useUnifiedTopology: true
 })
